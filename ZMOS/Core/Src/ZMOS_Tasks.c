@@ -23,6 +23,7 @@
  *************************************************************************************************************************/
 #include "ZMOS_Common.h"
 #include "ZMOS_Tasks.h"
+#include "ZMOS_Memory.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -37,16 +38,20 @@
 /**
  * Task link list.
  */
-typedef struct
+typedef struct zmosTaskList_T
 {
-    task_t taskHandle;
-    struct taskList_t *next;
-}taskList_t;
+    zmos_task_t taskHandle;
+    struct zmosTaskList_T *next;
+}zmosTaskList_t;
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
 /* Task list head */
-static taskList_t *taskListHead = NULL;
+static zmosTaskList_t *taskListHead = NULL;
+/* Task list end */
+//static taskList_t *taskListEnd = NULL;
+/*  */
+static uint8_t taskCnt = 0;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -66,5 +71,60 @@ static taskList_t *taskListHead = NULL;
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+
+/*****************************************************************
+* FUNCTION: zmos_taskRegister
+*
+* DESCRIPTION:
+*     Register task to ZMOS.
+* INPUTS:
+*     taskFunc : Task function.
+* RETURNS:
+*     task id(1 ~ 255).
+*     0 : register faild.
+* NOTE:
+*     It supports a maximum of 255 tasks.
+*****************************************************************/
+uint8_t zmos_taskRegister(taskFunction_t taskFunc)
+{
+    if(!taskFunc) return 0;
+    
+    zmosTaskList_t *newTask;
+    zmosTaskList_t *srchTask;
+    zmosTaskList_t *prevTask;
+    
+    srchTask = taskListHead;
+    
+    while(srchTask)
+    {
+        //Whether task is registered.
+        if(srchTask->taskHandle.taskFunc == taskFunc)
+        {
+            return srchTask->taskHandle.taskId;
+        }
+        prevTask = srchTask;
+        srchTask = srchTask->next;
+    }
+    if(!++taskCnt) return 0;
+    newTask = (zmosTaskList_t *)zmos_mem_malloc(sizeof(zmosTaskList_t));
+    if(newTask)
+    {
+        newTask->next = NULL;
+        newTask->taskHandle.event = 0;
+        newTask->taskHandle.taskFunc = taskFunc;
+        newTask->taskHandle.taskId = taskCnt;
+        /* Add to the linked list */
+        if(taskListHead)
+        {
+            prevTask->next = newTask;
+        }
+        else taskListHead = newTask;
+        
+        return newTask->taskHandle.taskId;
+    }
+    
+    return 0;
+}
+
+
 /****************************************************** END OF FILE ******************************************************/

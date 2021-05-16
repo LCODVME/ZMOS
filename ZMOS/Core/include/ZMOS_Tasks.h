@@ -43,18 +43,18 @@ extern "C"
     
     
 /**
- * Event handler function prototype
+ * Event handler function prototype.
  */
 typedef uEvent_t (*taskFunction_t)(uEvent_t event);
 /**
- *
+ * 
  */
 typedef struct
 {
     uint8_t taskId;
     uEvent_t event;
     taskFunction_t taskFunc;
-}task_t;
+}zmos_task_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
