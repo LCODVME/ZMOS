@@ -21,6 +21,8 @@
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
+#include <stdlib.h>
+#include "ZMOS_Types.h"
 #include "ZMOS_Memory.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
@@ -57,6 +59,37 @@
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
-
-
+/*****************************************************************
+* FUNCTION: zmos_mem_malloc
+*
+* DESCRIPTION: 
+*     ZMOS dynamic memory allocation.
+* INPUTS:
+*     size : The number of bytes to allocate from the HEAP.
+* RETURNS:
+*     The first address of the allocated memory space.
+*     NULL : faild, It may be out of memory.
+* NOTE:
+*     It's weak functions, you can redefine it.
+*****************************************************************/
+__weak void *zmos_mem_malloc(memsize_t size)
+{
+    return malloc(size);
+}
+/*****************************************************************
+* FUNCTION: zmos_mem_free
+*
+* DESCRIPTION: 
+*       ZMOS dynamic memory de-allocation.
+* INPUTS:
+*     ptr : The first address assigned by zmos_mem_malloc().
+* RETURNS:
+*     null
+* NOTE:
+*     It's weak functions, you can redefine it.
+*****************************************************************/
+__weak void zmos_mem_free(void *ptr)
+{
+    free(ptr);
+}
 /****************************************************** END OF FILE ******************************************************/

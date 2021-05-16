@@ -35,11 +35,39 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
- 
+typedef uint32_t memsize_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
  
+/*****************************************************************
+* FUNCTION: zmos_mem_malloc
+*
+* DESCRIPTION: 
+*     ZMOS dynamic memory allocation.
+* INPUTS:
+*     size : The number of bytes to allocate from the HEAP.
+* RETURNS:
+*     The first address of the allocated memory space.
+*     NULL : faild, It may be out of memory.
+* NOTE:
+*     It's weak functions, you can redefine it.
+*****************************************************************/
+void *zmos_mem_malloc(memsize_t size);
+/*****************************************************************
+* FUNCTION: zmos_mem_free
+*
+* DESCRIPTION: 
+*       ZMOS dynamic memory de-allocation.
+* INPUTS:
+*     ptr : The first address assigned by zmos_mem_malloc().
+* RETURNS:
+*     null
+* NOTE:
+*     It's weak functions, you can redefine it.
+*****************************************************************/
+void zmos_mem_free(void *ptr);
+
 #ifdef __cplusplus
 }
 #endif
