@@ -48,10 +48,7 @@ typedef struct zmosTaskList_T
  *************************************************************************************************************************/
 /* Task list head */
 static zmosTaskList_t *taskListHead = NULL;
-/* Task list end */
-//static taskList_t *taskListEnd = NULL;
-/*  */
-static uint8_t taskCnt = 0;
+
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -73,21 +70,22 @@ static uint8_t taskCnt = 0;
  *************************************************************************************************************************/
 
 /*****************************************************************
-* FUNCTION: zmos_taskRegister
+* FUNCTION: zmos_taskThreadRegister
 *
 * DESCRIPTION:
-*     Register task to ZMOS.
+*     Register task thread to ZMOS.
 * INPUTS:
+*     pTaskHandle : The handle of the task.
 *     taskFunc : Task function.
 * RETURNS:
-*     task id(1 ~ 255).
-*     0 : register faild.
+*     0 : Success.
+*     other : ref ZMOS task return cordes.
 * NOTE:
 *     It supports a maximum of 255 tasks.
 *****************************************************************/
-uint8_t zmos_taskRegister(taskFunction_t taskFunc)
+taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskFunction_t taskFunc)
 {
-    if(!taskFunc) return 0;
+    if(!taskFunc) return ZMOS_TASK_ERROR_PARAM;
     
     zmosTaskList_t *newTask;
     zmosTaskList_t *srchTask;
@@ -100,19 +98,23 @@ uint8_t zmos_taskRegister(taskFunction_t taskFunc)
         //Whether task is registered.
         if(srchTask->taskHandle.taskFunc == taskFunc)
         {
-            return srchTask->taskHandle.taskId;
+            if(pTaskHandle != NULL)
+            {
+                *pTaskHandle = &srchTask->taskHandle;
+            }
+            return ZMOS_TASK_SUCCESS;
         }
         prevTask = srchTask;
         srchTask = srchTask->next;
     }
-    if(!++taskCnt) return 0;
+    
     newTask = (zmosTaskList_t *)zmos_mem_malloc(sizeof(zmosTaskList_t));
     if(newTask)
     {
         newTask->next = NULL;
         newTask->taskHandle.event = 0;
         newTask->taskHandle.taskFunc = taskFunc;
-        newTask->taskHandle.taskId = taskCnt;
+        
         /* Add to the linked list */
         if(taskListHead)
         {
@@ -120,11 +122,83 @@ uint8_t zmos_taskRegister(taskFunction_t taskFunc)
         }
         else taskListHead = newTask;
         
-        return newTask->taskHandle.taskId;
+        if(pTaskHandle != NULL)
+        {
+            *pTaskHandle = &newTask->taskHandle;
+        }
+        
+        return ZMOS_TASK_SUCCESS;
     }
-    
-    return 0;
+    return ZMOS_TASK_FAILD;
 }
-
+/*****************************************************************
+* FUNCTION: zmos_taskThreadLogout
+*
+* DESCRIPTION:
+*     ZMOS log out the task.
+* INPUTS:
+*     pTaskHandle : The handle of the task to be deleted.
+* RETURNS:
+*     null
+* NOTE:
+*    Passing NULL will cause the calling task to be deleted.
+*****************************************************************/
+void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
+{
+    zmosTaskList_t *srchTask;
+    zmosTaskList_t *prevTask;
+    
+    srchTask = taskListHead;
+    
+    while(srchTask)
+    {
+        if(&srchTask->taskHandle == pTaskHandle)
+        {
+            break;
+        }
+        prevTask = srchTask;
+        srchTask = srchTask->next;
+    }
+    if(srchTask)
+    {
+        if(srchTask == taskListHead)
+        {
+            taskListHead = taskListHead->next;
+        }
+        else
+        {
+            prevTask->next = srchTask->next;
+        }
+        zmos_mem_free(srchTask);
+    }
+}
+/*****************************************************************
+* FUNCTION: zmos_getReadyTask
+*
+* DESCRIPTION:
+*     ZMOS Get the registered ready task.
+* INPUTS:
+*     null
+* RETURNS:
+*     Task handle.
+* NOTE:
+*     null
+*****************************************************************/
+zmos_taskHandle_t zmos_getReadyTask(void)
+{
+    zmosTaskList_t *srchTask;
+    
+    srchTask = taskListHead;
+    
+    while(srchTask)
+    {
+        if(srchTask->taskHandle.event)
+        {
+            return &srchTask->taskHandle;
+        }
+        srchTask = srchTask->next;
+    }
+    return NULL;
+}
 
 /****************************************************** END OF FILE ******************************************************/

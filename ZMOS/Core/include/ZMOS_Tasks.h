@@ -32,7 +32,12 @@ extern "C"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
- 
+     
+/* ZMOS task return cordes */
+#define ZMOS_TASK_SUCCESS           0
+#define ZMOS_TASK_FAILD             1
+#define ZMOS_TASK_ERROR_PARAM       2
+     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -40,18 +45,26 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-    
+
+/**
+ * ZMOS task result type.
+ * @ref ZMOS task return cordes.
+ */
+typedef uint8_t taskReslt_t;
+/**
+ * Zmos task handle.
+ */
+typedef struct zmos_task*  zmos_taskHandle_t;
     
 /**
  * Event handler function prototype.
  */
 typedef uEvent_t (*taskFunction_t)(uEvent_t event);
 /**
- * 
+ * ZMOS tsdk struct.
  */
-typedef struct
+typedef struct zmos_task
 {
-    uint8_t taskId;
     uEvent_t event;
     taskFunction_t taskFunc;
 }zmos_task_t;
