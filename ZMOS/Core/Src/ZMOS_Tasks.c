@@ -48,7 +48,8 @@ typedef struct zmosTaskList_T
  *************************************************************************************************************************/
 /* Task list head */
 static zmosTaskList_t *taskListHead = NULL;
-
+/* Index of active task */
+static zmos_taskHandle_t activeTask = NULL;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -147,12 +148,18 @@ void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
 {
     zmosTaskList_t *srchTask;
     zmosTaskList_t *prevTask;
+    zmos_taskHandle_t pDelTask = pTaskHandle;
+    
+    if(pDelTask == NULL)
+    {
+        pDelTask = activeTask;
+    }
     
     srchTask = taskListHead;
     
     while(srchTask)
     {
-        if(&srchTask->taskHandle == pTaskHandle)
+        if(&srchTask->taskHandle == pDelTask)
         {
             break;
         }
@@ -184,9 +191,10 @@ void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
 * NOTE:
 *     null
 *****************************************************************/
-zmos_taskHandle_t zmos_getReadyTask(void)
+static zmos_taskHandle_t zmos_getReadyTask(void)
 {
     zmosTaskList_t *srchTask;
+    zmos_task_t *task = NULL;
     
     srchTask = taskListHead;
     
@@ -194,11 +202,48 @@ zmos_taskHandle_t zmos_getReadyTask(void)
     {
         if(srchTask->taskHandle.event)
         {
-            return &srchTask->taskHandle;
+            task = &srchTask->taskHandle;
+            break;
         }
         srchTask = srchTask->next;
     }
-    return NULL;
+    return (zmos_taskHandle_t)task;
 }
 
+/*****************************************************************
+* FUNCTION: zmos_taskStartScheduler
+*
+* DESCRIPTION:
+*     
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_taskStartScheduler(void)
+{
+    zmos_taskHandle_t pNextTask;
+        
+    pNextTask = zmos_getReadyTask();
+    
+    if(pNextTask)
+    {
+        uEvent_t events;
+        
+        ZMOS_TASK_ENTER_CRITICAL();
+        events = pNextTask->event;
+        pNextTask->event = 0;
+        ZMOS_TASK_EXIT_CRITICAL();
+        
+        activeTask = pNextTask;
+        events = pNextTask->taskFunc(events);
+        activeTask = NULL;
+        
+        ZMOS_TASK_ENTER_CRITICAL();
+        pNextTask->event |= events;
+        ZMOS_TASK_EXIT_CRITICAL();
+    }
+}
 /****************************************************** END OF FILE ******************************************************/
