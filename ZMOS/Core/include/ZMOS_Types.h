@@ -64,11 +64,11 @@ typedef unsigned char bool;         //!< Boolean data type
  * 
  */
 #if (ZMOS_TASK_EVENT_NUM_MAX <= 8)
-    typedef uint8_t uEvent_t;
+    typedef uint8_t uTaskEvent_t;
 #elif (ZMOS_TASK_EVENT_NUM_MAX <= 16)
-    typedef uint16_t uEvent_t;
+    typedef uint16_t uTaskEvent_t;
 #else
-    typedef uint32_t uEvent_t;
+    typedef uint32_t uTaskEvent_t;
 #endif
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *

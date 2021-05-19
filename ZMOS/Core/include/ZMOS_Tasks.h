@@ -38,8 +38,8 @@ extern "C"
 #define ZMOS_TASK_FAILD             1
 #define ZMOS_TASK_ERROR_PARAM       2
      
-#define ZMOS_TASK_ENTER_CRITICAL() 
-#define ZMOS_TASK_EXIT_CRITICAL() 
+#define ZMOS_ENTER_CRITICAL() 
+#define ZMOS_EXIT_CRITICAL() 
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -61,13 +61,13 @@ typedef struct zmos_task*  zmos_taskHandle_t;
 /**
  * Event handler function prototype.
  */
-typedef uEvent_t (*taskFunction_t)(uEvent_t event);
+typedef uTaskEvent_t (*taskFunction_t)(uTaskEvent_t event);
 /**
  * ZMOS tsdk struct.
  */
 typedef struct zmos_task
 {
-    uEvent_t event;
+    uTaskEvent_t event;
     taskFunction_t taskFunc;
 }zmos_task_t;
 /*************************************************************************************************************************

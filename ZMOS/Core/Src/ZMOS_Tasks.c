@@ -61,7 +61,7 @@ static zmos_taskHandle_t activeTask = NULL;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
- 
+static zmos_taskHandle_t zmos_getReadyTask(void);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -79,7 +79,7 @@ static zmos_taskHandle_t activeTask = NULL;
 *     pTaskHandle : The handle of the task.
 *     taskFunc : Task function.
 * RETURNS:
-*     0 : Success.
+*     0 : Success (ZMOS_TASK_SUCCESS).
 *     other : ref ZMOS task return cordes.
 * NOTE:
 *     It supports a maximum of 255 tasks.
@@ -179,6 +179,95 @@ void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
         zmos_mem_free(srchTask);
     }
 }
+
+/*****************************************************************
+* FUNCTION: zmos_setTaskEvent
+*
+* DESCRIPTION:
+*     This function to set task event.
+* INPUTS:
+*     pTaskHandle : The handle of the task to set event.
+*     events : what event to set.
+* RETURNS:
+*     0 : Success (ZMOS_TASK_SUCCESS).
+*     other : ref ZMOS task return cordes.
+* NOTE:
+*     null
+*****************************************************************/
+taskReslt_t zmos_setTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events)
+{
+    if(pTaskHandle)
+    {
+        ZMOS_ENTER_CRITICAL();
+        pTaskHandle->event |= events;
+        ZMOS_EXIT_CRITICAL();
+        return ZMOS_TASK_SUCCESS;
+    }
+    return ZMOS_TASK_ERROR_PARAM;
+}
+
+/*****************************************************************
+* FUNCTION: zmos_clearTaskEvent
+*
+* DESCRIPTION:
+*     This function to clear task event.
+* INPUTS:
+*     pTaskHandle : The handle of the task to clear event.
+*     events : what event to clear.
+* RETURNS:
+*     0 : Success (ZMOS_TASK_SUCCESS).
+*     other : ref ZMOS task return cordes.
+* NOTE:
+*     null
+*****************************************************************/
+taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events)
+{
+    if(pTaskHandle)
+    {
+        ZMOS_ENTER_CRITICAL();
+        pTaskHandle->event &= ~events;
+        ZMOS_EXIT_CRITICAL();
+        return ZMOS_TASK_SUCCESS;
+    }
+    return ZMOS_TASK_ERROR_PARAM;
+}
+/*****************************************************************
+* FUNCTION: zmos_taskStartScheduler
+*
+* DESCRIPTION:
+*     
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_taskStartScheduler(void)
+{
+    zmos_taskHandle_t pNextTask;
+        
+    pNextTask = zmos_getReadyTask();
+    
+    if(pNextTask)
+    {
+        uTaskEvent_t events;
+        
+        ZMOS_ENTER_CRITICAL();
+        events = pNextTask->event;
+        pNextTask->event = 0;
+        ZMOS_EXIT_CRITICAL();
+        
+        activeTask = pNextTask;
+        events = pNextTask->taskFunc(events);
+        activeTask = NULL;
+        
+        ZMOS_ENTER_CRITICAL();
+        pNextTask->event |= events;
+        ZMOS_EXIT_CRITICAL();
+    }
+}
+
 /*****************************************************************
 * FUNCTION: zmos_getReadyTask
 *
@@ -210,40 +299,4 @@ static zmos_taskHandle_t zmos_getReadyTask(void)
     return (zmos_taskHandle_t)task;
 }
 
-/*****************************************************************
-* FUNCTION: zmos_taskStartScheduler
-*
-* DESCRIPTION:
-*     
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_taskStartScheduler(void)
-{
-    zmos_taskHandle_t pNextTask;
-        
-    pNextTask = zmos_getReadyTask();
-    
-    if(pNextTask)
-    {
-        uEvent_t events;
-        
-        ZMOS_TASK_ENTER_CRITICAL();
-        events = pNextTask->event;
-        pNextTask->event = 0;
-        ZMOS_TASK_EXIT_CRITICAL();
-        
-        activeTask = pNextTask;
-        events = pNextTask->taskFunc(events);
-        activeTask = NULL;
-        
-        ZMOS_TASK_ENTER_CRITICAL();
-        pNextTask->event |= events;
-        ZMOS_TASK_EXIT_CRITICAL();
-    }
-}
 /****************************************************** END OF FILE ******************************************************/
