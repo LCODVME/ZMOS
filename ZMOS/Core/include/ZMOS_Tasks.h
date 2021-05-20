@@ -73,7 +73,53 @@ typedef struct zmos_task
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+
+/*****************************************************************
+* FUNCTION: zmos_taskThreadRegister
+*
+* DESCRIPTION:
+*     Register task thread to ZMOS.
+* INPUTS:
+*     pTaskHandle : The handle of the task.
+*     taskFunc : Task function.
+* RETURNS:
+*     0 : Success (ZMOS_TASK_SUCCESS).
+*     other : ref ZMOS task return cordes.
+* NOTE:
+*     It supports a maximum of 255 tasks.
+*****************************************************************/
+taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskFunction_t taskFunc);
+/*****************************************************************
+* FUNCTION: zmos_setTaskEvent
+*
+* DESCRIPTION:
+*     This function to set task event.
+* INPUTS:
+*     pTaskHandle : The handle of the task to set event.
+*     events : what event to set.
+* RETURNS:
+*     0 : Success (ZMOS_TASK_SUCCESS).
+*     other : ref ZMOS task return cordes.
+* NOTE:
+*     null
+*****************************************************************/
+taskReslt_t zmos_setTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events);
+/*****************************************************************
+* FUNCTION: zmos_clearTaskEvent
+*
+* DESCRIPTION:
+*     This function to clear task event.
+* INPUTS:
+*     pTaskHandle : The handle of the task to clear event.
+*     events : what event to clear.
+* RETURNS:
+*     0 : Success (ZMOS_TASK_SUCCESS).
+*     other : ref ZMOS task return cordes.
+* NOTE:
+*     null
+*****************************************************************/
+taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events);
+
 #ifdef __cplusplus
 }
 #endif
