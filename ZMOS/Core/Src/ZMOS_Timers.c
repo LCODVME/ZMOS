@@ -138,6 +138,173 @@ timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
     return ZMOS_TIMER_FAILD;
 }
 /*****************************************************************
+* FUNCTION: zmos_stopTimer
+*
+* DESCRIPTION:
+*     This function to stop a timer.
+* INPUTS:
+*     pTaskHandle : task handle of timer to stop.
+*     event : task event of timer to stop.
+* RETURNS:
+*     0 : success (ZMOS_TIMER_SUCCESS).
+* NOTE:
+*     null
+*****************************************************************/
+timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
+{
+    zmos_timer_t *pTimer;
+    
+    pTimer = zmos_findTimer(pTaskHandle, event);
+    
+    if(pTimer)
+    {
+        zmos_deleteTimer(pTimer);
+        return ZMOS_TIMER_SUCCESS;
+    }
+    return ZMOS_TIMER_FAILD;
+}
+/*****************************************************************
+* FUNCTION: zmos_getCurrentTimeout
+*
+* DESCRIPTION:
+*     Get timer current timeout.
+* INPUTS:
+*     pTaskHandle : task handle of timer to check.
+*     event : task event of timer to check.
+* RETURNS:
+*     Return the timer's tick count if found, zero otherwise.
+* NOTE:
+*     null
+*****************************************************************/
+uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
+{
+    zmos_timer_t *pTimer;
+    
+    pTimer = zmos_findTimer(pTaskHandle, event);
+    
+    if(pTimer)
+    {
+        return pTimer->timeout;
+    }
+    return 0;
+}
+/*****************************************************************
+* FUNCTION: zmos_getNextLowestTimeout
+*
+* DESCRIPTION:
+*     Search timer table to return the lowest timeout value. 
+* INPUTS:
+*     null
+* RETURNS:
+*     The lowest timeout value. 
+* NOTE:
+*     If the timer list is empty, then the returned timeout will 
+*     be TIMER_MAX_TIMEOUT.
+*****************************************************************/
+uint32_t zmos_getNextLowestTimeout(void)
+{
+    uint32_t timeout = TIMER_MAX_TIMEOUT;
+    zmos_timer_t *srchTimer = timerListHead;
+    
+    while(srchTimer)
+    {
+        if(srchTimer->timeout < timeout)
+        {
+            timeout = srchTimer->timeout;
+        }
+        srchTimer = srchTimer->next;
+    }
+    return timeout;
+}
+/*****************************************************************
+* FUNCTION: zmos_timeTickUpdate
+*
+* DESCRIPTION:
+*     Update the timer time tick.
+* INPUTS:
+*     upTime : update time value.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_timeTickUpdate(uint32_t upTime)
+{
+    zmos_timer_t *srchTimer;
+    zmos_timer_t *prevTimer;
+    zmos_timer_t *freeTimer;
+    
+    ZMOS_ENTER_CRITICAL();
+    zmos_timerClock += upTime;
+    ZMOS_EXIT_CRITICAL();
+    
+    prevTimer = NULL;
+    srchTimer = timerListHead;
+    
+    while(srchTimer)
+    {
+        freeTimer = NULL;
+        
+        if(srchTimer->timeout > upTime)
+        {
+            srchTimer->timeout -= upTime;
+        }
+        else
+        {
+            srchTimer->timeout = 0;
+        }
+        
+        if(srchTimer->timeout == 0 && srchTimer->event)
+        {
+            //Set Task event.
+            zmos_setTaskEvent(srchTimer->taskHandle, srchTimer->event);
+            //Reload time value.
+            srchTimer->timeout = srchTimer->reloadTime;
+                
+        }
+        if(srchTimer->timeout == 0 || srchTimer->event == 0)
+        {
+            if(prevTimer)
+            {
+                prevTimer->next = srchTimer->next;
+            }
+            else
+            {
+                timerListHead = timerListHead->next;
+            }
+            
+            freeTimer = srchTimer;
+            srchTimer = srchTimer->next;
+        }
+        else
+        {
+            prevTimer = srchTimer;
+            srchTimer = srchTimer->next;
+        }
+        
+        if(freeTimer)
+        {
+            zmos_mem_free(freeTimer);
+        }
+    }
+}
+/*****************************************************************
+* FUNCTION: zmos_getTimerClock
+*
+* DESCRIPTION:
+*     Read the local timer clock.
+* INPUTS:
+*     null
+* RETURNS:
+*     timer clock.
+* NOTE:
+*     null
+*****************************************************************/
+uint32_t zmos_getTimerClock(void)
+{
+    return zmos_timerClock;
+}
+/*****************************************************************
 * FUNCTION: zmos_findTimer
 *
 * DESCRIPTION:
