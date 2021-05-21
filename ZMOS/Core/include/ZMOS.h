@@ -27,7 +27,8 @@ extern "C"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
- 
+#define ZMOS_ENTER_CRITICAL()   zmos_sysEnterCritical()
+#define ZMOS_EXIT_CRITICAL()    zmos_sysExitCritical()
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -39,7 +40,60 @@ extern "C"
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+/*****************************************************************
+* FUNCTION: zmos_sysEnterCritical
+*
+* DESCRIPTION:
+*     System enter critical.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_sysEnterCritical(void);
+/*****************************************************************
+* FUNCTION: zmos_sysExitCritical
+*
+* DESCRIPTION:
+*     System exit critical.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_sysExitCritical(void);
+/*****************************************************************
+* FUNCTION: zmos_system_init
+*
+* DESCRIPTION:
+*     ZMOS system initialize.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_system_init(void);
+/*****************************************************************
+* FUNCTION: zmos_system_start
+*
+* DESCRIPTION:
+*     ZMOS system run start
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     This function is the main loop function of the task system. 
+*     This Function doesn't return.
+*****************************************************************/
+void zmos_system_start(void);
+
 #ifdef __cplusplus
 }
 #endif

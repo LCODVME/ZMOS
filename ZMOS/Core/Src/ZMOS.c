@@ -25,6 +25,7 @@
 #include "ZMOS_Timers.h"
 #include "ZMOS_Tasks.h"
 #include "bsp_clock.h"
+#include "bsp.h"
 #include "ZMOS.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
@@ -41,7 +42,8 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
- 
+/* ZMOS nesting variable */
+static uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -88,6 +90,43 @@ static void zmos_systemClockUpdate(void)
     }
 }
 /*****************************************************************
+* FUNCTION: zmos_sysEnterCritical
+*
+* DESCRIPTION:
+*     System enter critical.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_sysEnterCritical(void)
+{
+    bsp_mcuDisableInterrupt();
+    
+    zmosCriticalNesting++;
+}
+/*****************************************************************
+* FUNCTION: zmos_sysExitCritical
+*
+* DESCRIPTION:
+*     System exit critical.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_sysExitCritical(void)
+{
+    if(zmosCriticalNesting && --zmosCriticalNesting == 0)
+    {
+        bsp_mcuEnableInterrupt();
+    }
+}
+/*****************************************************************
 * FUNCTION: zmos_system_init
 *
 * DESCRIPTION:
@@ -101,7 +140,11 @@ static void zmos_systemClockUpdate(void)
 *****************************************************************/
 void zmos_system_init(void)
 {
+    bsp_init();
+    
     zmos_timerInit();
+    
+    zmosCriticalNesting = 0;
 }
 
 /*****************************************************************
