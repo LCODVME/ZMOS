@@ -24,6 +24,7 @@
 #include "ZMOS_Common.h"
 #include "ZMOS_Timers.h"
 #include "ZMOS_Tasks.h"
+#include "bsp_clock.h"
 #include "ZMOS.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
@@ -60,7 +61,32 @@ extern void zmos_taskStartScheduler(void);
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
-
+/*****************************************************************
+* FUNCTION: zmos_systemClockUpdate
+*
+* DESCRIPTION:
+*     Update system clock.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+static void zmos_systemClockUpdate(void)
+{
+    uint32_t zmos_clock;
+    uint32_t clockCnt;
+    
+    //Get the clock count of timer ticks.
+    clockCnt = bsp_getClockCount();
+    zmos_clock = zmos_getTimerClock();
+    
+    if(zmos_clock != clockCnt)
+    {
+        zmos_timeTickUpdate(clockCnt - zmos_clock);
+    }
+}
 /*****************************************************************
 * FUNCTION: zmos_system_init
 *
@@ -95,6 +121,7 @@ void zmos_system_start(void)
 {
     while(1)
     {
+        zmos_systemClockUpdate();
         
         zmos_taskStartScheduler();
         
