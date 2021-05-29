@@ -31,7 +31,7 @@ extern "C"
  * @brief types lib select.
  */
 #ifndef ZMOS_TYPES_USE_CLIB
-#define ZMOS_TYPES_USE_CLIB     1
+#define ZMOS_TYPES_USE_CLIB         1
 #endif
     
 /**
@@ -42,6 +42,18 @@ extern "C"
  */
 #ifndef ZMOS_TASK_EVENT_NUM_MAX
 #define ZMOS_TASK_EVENT_NUM_MAX     32
+#endif
+    
+/**
+ * @brief ZMOS callback timer use enable.
+ *        1 : enable
+ *        0 : disable
+ *
+ * @note The maximum number of callback timers that can be 
+ *       created is ZMOS_TASK_EVENT_NUM_MAX.
+ */
+#ifndef ZMOS_USE_CBTIMERS
+#define ZMOS_USE_CBTIMERS           0
 #endif
     
 /*************************************************************************************************************************
