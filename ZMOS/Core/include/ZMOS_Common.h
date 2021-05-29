@@ -40,6 +40,20 @@ extern "C"
 #endif
     
 /**
+ * Bit set.
+ */
+#ifndef BS
+#define BS(n)   (1 << (n))
+#endif
+    
+/**
+ * Bit clear.
+ */
+#ifndef BC
+#define BC(n)   ~(1 << (n))
+#endif
+    
+/**
  * ZMOS general return codes.
  */
 //#define ZMOS_
