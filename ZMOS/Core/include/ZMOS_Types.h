@@ -60,7 +60,7 @@ typedef unsigned char bool;         //!< Boolean data type
 #endif
 
 /**
- * 
+ * Task event types.
  */
 #if (ZMOS_TASK_EVENT_NUM_MAX <= 8)
     typedef uint8_t uTaskEvent_t;

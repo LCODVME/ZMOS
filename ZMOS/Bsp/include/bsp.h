@@ -4,7 +4,7 @@
 * bsp.h
 *
 * DESCRIPTION:
-*     Board support package
+*     Board support package.
 * AUTHOR:
 *     zm
 * CREATED DATE:
