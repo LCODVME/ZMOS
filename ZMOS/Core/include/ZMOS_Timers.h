@@ -73,6 +73,7 @@ void zmos_timerInit(void);
 * INPUTS:
 *     pTaskHandle : Which task to set event.
 *     event : What event to set.
+*     timeout : Timer timeout.
 * RETURNS:
 *     0 : success (ZMOS_TIMER_SUCCESS).
 * NOTE:
@@ -87,6 +88,7 @@ timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
 * INPUTS:
 *     pTaskHandle : Which task to set event.
 *     event : What event to set.
+*     timeout : Timer timeout.
 * RETURNS:
 *     0 : success (ZMOS_TIMER_SUCCESS).
 * NOTE:
@@ -121,6 +123,20 @@ timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 *     null
 *****************************************************************/
 uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
+/*****************************************************************
+* FUNCTION: zmos_getReloadTime
+*
+* DESCRIPTION:
+*     Get timer reload time.
+* INPUTS:
+*     pTaskHandle : task handle of timer to check.
+*     event : task event of timer to check.
+* RETURNS:
+*     Timer reload time.
+* NOTE:
+*     null
+*****************************************************************/
+uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 /*****************************************************************
 * FUNCTION: zmos_getNextLowestTimeout
 *

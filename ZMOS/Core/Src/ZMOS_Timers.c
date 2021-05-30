@@ -172,6 +172,7 @@ timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
 * INPUTS:
 *     pTaskHandle : task handle of timer to check.
 *     event : task event of timer to check.
+*     timeout : Timer timeout.
 * RETURNS:
 *     Return the timer's tick count if found, zero otherwise.
 * NOTE:
@@ -186,6 +187,32 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
     if(pTimer)
     {
         return pTimer->timeout;
+    }
+    return 0;
+}
+/*****************************************************************
+* FUNCTION: zmos_getReloadTime
+*
+* DESCRIPTION:
+*     Get timer reload time.
+* INPUTS:
+*     pTaskHandle : task handle of timer to check.
+*     event : task event of timer to check.
+*     timeout : Timer timeout.
+* RETURNS:
+*     Timer reload time.
+* NOTE:
+*     null
+*****************************************************************/
+uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
+{
+    zmos_timer_t *pTimer;
+    
+    pTimer = zmos_findTimer(pTaskHandle, event);
+    
+    if(pTimer)
+    {
+        return pTimer->reloadTime;
     }
     return 0;
 }
@@ -341,6 +368,7 @@ static zmos_timer_t *zmos_findTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t 
 * INPUTS:
 *     pTaskHandle : Which task to set event.
 *     event : What event to set.
+*     timeout : Timer timeout.
 * RETURNS:
 *     null
 * NOTE:
@@ -361,6 +389,7 @@ static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
             {
                 //The timer already exists - update time.
                 srchTimer->timeout = timeout;
+                srchTimer->reloadTime = 0;
                 return srchTimer;
             }
             prevTimer = srchTimer;
