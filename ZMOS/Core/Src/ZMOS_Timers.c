@@ -133,10 +133,9 @@ timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
     if(newTimer)
     {
         newTimer->reloadTime = timeout;
-        return ZMOS_TIMER_SUCCESS;
     }
     ZMOS_EXIT_CRITICAL();
-    return ZMOS_TIMER_FAILD;
+    return (newTimer != NULL ? ZMOS_TIMER_SUCCESS : ZMOS_TIMER_FAILD);
 }
 /*****************************************************************
 * FUNCTION: zmos_stopTimer
