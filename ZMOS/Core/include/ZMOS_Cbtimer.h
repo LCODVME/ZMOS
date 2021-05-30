@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.h
+* ZMOS_Cbtimer.h
 *
 * DESCRIPTION:
-*     ZMOS
+*     Callback timer function.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/5/29
 * REVISION:
 *     v0.1
 *
@@ -17,8 +17,8 @@
 * $Log:$
 *
 *****************************************************************/
-#ifndef __ZMOS_H__
-#define __ZMOS_H__
+#ifndef __ZMOS_CBTIMER_H__
+#define __ZMOS_CBTIMER_H__
  
 #ifdef __cplusplus
 extern "C"
@@ -27,15 +27,11 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Cbtimer.h"
-#include "ZMOS_Tasks.h"
+#include "ZMOS_Types.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_ENTER_CRITICAL()   zmos_sysEnterCritical()
-#define ZMOS_EXIT_CRITICAL()    zmos_sysExitCritical()
+ 
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -43,15 +39,22 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
- 
+/**
+ * Callback timer function prototype.
+ */
+typedef void (* cbTimerFunction)(void *param);
+/**
+ * Callback timer id type.
+ */
+typedef uint8_t cbTimerId_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: zmos_cbTimerInit
 *
 * DESCRIPTION:
-*     System enter critical.
+*     ZMOS callback timer initialize
 * INPUTS:
 *     null
 * RETURNS:
@@ -59,49 +62,68 @@ extern "C"
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void);
+void zmos_cbTimerInit(void);
 /*****************************************************************
-* FUNCTION: zmos_sysExitCritical
+* FUNCTION: zmos_startSingleCbtimer
 *
 * DESCRIPTION:
-*     System exit critical.
+*     This function is called to start a single callback timer.
 * INPUTS:
-*     null
+*     timerId : The callback timer id.
+*     timeout : Timer timeout.
+*     param : Param to be passed in to callback function.
+*     cbfunc : Callback function.
 * RETURNS:
-*     null
+*     0 : success (ZMOS_TIMER_SUCCESS).
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysExitCritical(void);
+timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
-* FUNCTION: zmos_system_init
+* FUNCTION: zmos_startReloadCbtimer
 *
 * DESCRIPTION:
-*     ZMOS system initialize.
+*     This function is called to start a reload callback timer.
 * INPUTS:
-*     null
+*     timerId : The callback timer id.
+*     timeout : Timer timeout.
+*     param : Param to be passed in to callback function.
+*     cbfunc : Callback function.
 * RETURNS:
-*     null
+*     0 : success (ZMOS_TIMER_SUCCESS).
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_system_init(void);
+timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
-* FUNCTION: zmos_system_start
+* FUNCTION: zmos_changeCbTimerTimeout
 *
 * DESCRIPTION:
-*     ZMOS system run start
+*     This to change a callback timer timeout.
 * INPUTS:
-*     null
+*     timerId : The callback timer id.
+*     timeout : Timer new timeout.
 * RETURNS:
-*     null
+*     0 : success (ZMOS_TIMER_SUCCESS).
 * NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
+*     null
 *****************************************************************/
-void zmos_system_start(void);
+timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout);
+/*****************************************************************
+* FUNCTION: zmos_stopCbtimer
+*
+* DESCRIPTION:
+*     This function to stop a callback timer.
+* INPUTS:
+*     timerId : The callback timer id.
+* RETURNS:
+*     0 : success (ZMOS_TIMER_SUCCESS).
+* NOTE:
+*     null
+*****************************************************************/
+timerReslt_t zmos_stopCbtimer(cbTimerId_t timerId);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ZMOS.h */
+#endif /* ZMOS_Cbtimer.h */

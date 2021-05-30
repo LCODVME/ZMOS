@@ -53,7 +53,7 @@ extern "C"
  *       created is ZMOS_TASK_EVENT_NUM_MAX.
  */
 #ifndef ZMOS_USE_CBTIMERS
-#define ZMOS_USE_CBTIMERS           0
+#define ZMOS_USE_CBTIMERS           1
 #endif
     
 /*************************************************************************************************************************

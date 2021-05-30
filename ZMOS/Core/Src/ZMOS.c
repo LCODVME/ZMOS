@@ -144,6 +144,10 @@ void zmos_system_init(void)
     
     zmos_timerInit();
     
+#if ZMOS_USE_CBTIMERS > 0
+    zmos_cbTimerInit();
+#endif
+    
     zmosCriticalNesting = 0;
 }
 
