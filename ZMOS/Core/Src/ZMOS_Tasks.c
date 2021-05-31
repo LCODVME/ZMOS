@@ -236,13 +236,13 @@ taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
 * FUNCTION: zmos_taskStartScheduler
 *
 * DESCRIPTION:
-*     
+*     This function performs task scheduling.
 * INPUTS:
 *     null
 * RETURNS:
 *     null
 * NOTE:
-*     null
+*     Shouldn't be called from anywhere else.
 *****************************************************************/
 void zmos_taskStartScheduler(void)
 {
