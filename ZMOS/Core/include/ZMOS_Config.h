@@ -55,6 +55,16 @@ extern "C"
 #ifndef ZMOS_USE_CBTIMERS
 #define ZMOS_USE_CBTIMERS           1
 #endif
+
+/**
+ * @brief ZMOS low power management use enable.
+ *        1 : enable
+ *        0 : disable
+ *
+ */
+#ifndef ZMOS_USE_LOW_POWER
+#define ZMOS_USE_LOW_POWER          0
+#endif
     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
