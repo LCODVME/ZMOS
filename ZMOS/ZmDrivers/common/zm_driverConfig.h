@@ -39,11 +39,17 @@ extern "C"
  *       The larger the value, the more space it takes up.
  */
 #ifndef ZM_LED_MAX_NUM
-#define ZM_LED_MAX_NUM          1
+#define ZM_LED_MAX_NUM          2
 #endif
     
 #if ZM_LED_MAX_NUM > 0
-    
+     
+#if ZM_LED_MAX_NUM > 32
+#error "The leds num no more than 32."
+#endif
+/* ZM led blink enable */
+#define ZM_LED_BLINK
+     
 #endif
 /**********************End of zm led dirver config*****************/
     
