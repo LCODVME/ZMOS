@@ -64,7 +64,8 @@
 * DESCRIPTION:
 *     This function to achieve MCU driven LED on/off function.
 * INPUTS:
-*     
+*     led : Bit mask value of led to be set.
+*     mode : Turn on or off.
 * RETURNS:
 *     null
 * NOTE:
@@ -77,11 +78,11 @@ __weak void zm_ledBoardOnOff(zmLedType_t led, uint8_t mode)
     case ZM_LED_1:
         if(mode)
         {
-            
+            // Led on.
         }
         else
         {
-            
+             //Led off.
         }
         break;
     case ZM_LED_2:
