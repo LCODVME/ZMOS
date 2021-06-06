@@ -22,7 +22,12 @@
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
 #include "ZMOS.h"
+#include "zm_driverConfig.h"
 #include "zm_drivers.h"
+
+#if ZM_LED_MAX_NUM > 0
+#include "zm_led.h"
+#endif
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -54,7 +59,9 @@ static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+#if ZM_LED_MAX_NUM > 0 && (defined ZM_LED_BLINK)
+extern void zm_updateLedBlink(void);
+#endif
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -74,10 +81,35 @@ void zmDriverInit(void)
 {
     //Register task in ZMOS
     zmos_taskThreadRegister(&driverTaskHandle, zmDriverPorcessEvent);
-    
-    
+    /* ZM led */
+#if ZM_LED_MAX_NUM > 0
+    zm_ledInit();
+#endif
 }
-
+/*****************************************************************
+* FUNCTION: zmDriverPorcessEvent
+*
+* DESCRIPTION:
+*     
+* INPUTS:
+*     
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
+{
+    if(events & ZM_DRIVER_LED_BLINK_EVENT)
+    {
+#ifdef ZM_LED_BLINK
+        zm_updateLedBlink();
+#endif
+        return events ^ ZM_DRIVER_LED_BLINK_EVENT;
+    }
+    
+    return 0;
+}
 /*****************************************************************
 * FUNCTION: zmDriverSetEvent
 *
@@ -139,20 +171,5 @@ timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events)
 {
     return zmos_stopTimer(driverTaskHandle, events);
 }
-/*****************************************************************
-* FUNCTION: zmDriverPorcessEvent
-*
-* DESCRIPTION:
-*     
-* INPUTS:
-*     
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
-{
-    return 0;
-}
+
 /****************************************************** END OF FILE ******************************************************/
