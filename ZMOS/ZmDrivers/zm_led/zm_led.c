@@ -485,6 +485,10 @@ static void zm_ledOnOff(zmLedType_t leds, uint8_t mode)
     
 }
 #else
-
+void zm_ledInit(void) {}
+void zm_ledSet(zmLedType_t leds, uint8_t mode) {}
+void zm_ledOnTime(zmLedType_t leds, uint32_t time) {}
+void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uint16_t period) {}
+void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, uint16_t period) {}
 #endif
 /****************************************************** END OF FILE ******************************************************/
