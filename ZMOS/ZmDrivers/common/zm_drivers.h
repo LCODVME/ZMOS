@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.h
+* zm_drivers.h
 *
 * DESCRIPTION:
-*     ZMOS
+*     Based on the ZMOS system driver.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/6/1
 * REVISION:
 *     v0.1
 *
@@ -17,8 +17,8 @@
 * $Log:$
 *
 *****************************************************************/
-#ifndef __ZMOS_H__
-#define __ZMOS_H__
+#ifndef __ZM_DRIVERS_H__
+#define __ZM_DRIVERS_H__
  
 #ifdef __cplusplus
 extern "C"
@@ -27,16 +27,19 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Cbtimer.h"
-#include "ZMOS_Tasks.h"
-#include "ZMOS_LowPwr.h"
+
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_ENTER_CRITICAL()   zmos_sysEnterCritical()
-#define ZMOS_EXIT_CRITICAL()    zmos_sysExitCritical()
+/***********************************************
+ * ZM driver event.
+ *
+ * MIN = 0
+ * MAX = 31
+ */
+#define ZM_DRIVER_LED_BLINK_EVENT       BS(0)
+     
+     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -49,10 +52,10 @@ extern "C"
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: zmDriverInit
 *
 * DESCRIPTION:
-*     System enter critical.
+*     ZM drvers initialize
 * INPUTS:
 *     null
 * RETURNS:
@@ -60,49 +63,54 @@ extern "C"
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void);
+void zmDriverInit(void);
 /*****************************************************************
-* FUNCTION: zmos_sysExitCritical
+* FUNCTION: zmDriverSetEvent
 *
 * DESCRIPTION:
-*     System exit critical.
+*     This function set event in drver process.
 * INPUTS:
-*     null
+*     events : The event to set.
 * RETURNS:
-*     null
+*     0 : success.
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysExitCritical(void);
+taskReslt_t zmDriverSetEvent(uTaskEvent_t events);
 /*****************************************************************
-* FUNCTION: zmos_system_init
+* FUNCTION: zmDriverSetTimerEvent
 *
 * DESCRIPTION:
-*     ZMOS system initialize.
+*     This function start an event timer.
 * INPUTS:
-*     null
+*     events : The event to set.
+*     timeout : timeout.
+*     reload : Is reload timer.
+*              true : reload timer.
+*              false : single timer.
 * RETURNS:
-*     null
+*     0 : success.
 * NOTE:
-*     null
+*     If the event timer already exists, Timeout and Reload 
+*     properties will be updated.
 *****************************************************************/
-void zmos_system_init(void);
+timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload);
 /*****************************************************************
-* FUNCTION: zmos_system_start
+* FUNCTION: zmDriverStopTimerEvent
 *
 * DESCRIPTION:
-*     ZMOS system run start
+*     This function stop an event timer.
 * INPUTS:
-*     null
+*     events : The event to stop.
 * RETURNS:
-*     null
+*     0 : success.
+*     other : The timer doesn't exist.
 * NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
+*     null
 *****************************************************************/
-void zmos_system_start(void);
+timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ZMOS.h */
+#endif /* zm_drivers.h */

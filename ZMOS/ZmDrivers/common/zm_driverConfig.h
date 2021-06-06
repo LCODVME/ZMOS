@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS_Config.h
+* zm_driverConfig.h
 *
 * DESCRIPTION:
-*     ZMOS config
+*     ZM driver config.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/6/2
 * REVISION:
 *     v0.1
 *
@@ -17,8 +17,8 @@
 * $Log:$
 *
 *****************************************************************/
-#ifndef __ZMOS_CONFIG_H__
-#define __ZMOS_CONFIG_H__
+#ifndef __ZM_DRIVERCONFIG_H__
+#define __ZM_DRIVERCONFIG_H__
  
 #ifdef __cplusplus
 extern "C"
@@ -27,44 +27,31 @@ extern "C"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-/**
- * @brief types lib select.
+
+/*******************************************************************
+ *  ZM led driver config.
  */
-#ifndef ZMOS_TYPES_USE_CLIB
-#define ZMOS_TYPES_USE_CLIB         1
-#endif
-    
 /**
- * @brief ZMOS task maximum support event is the number.
- *        the value is 8¡¢16 or 32.
+ * @brief ZM led drivers maximum support leds is the number.
+ *        0 : ZM led drivers are not used.
  *
  * @note No more than 32.
+ *       The larger the value, the more space it takes up.
  */
-#ifndef ZMOS_TASK_EVENT_NUM_MAX
-#define ZMOS_TASK_EVENT_NUM_MAX     32
+#ifndef ZM_LED_MAX_NUM
+#define ZM_LED_MAX_NUM          0
 #endif
     
-/**
- * @brief ZMOS callback timer use enable.
- *        1 : enable
- *        0 : disable
- *
- * @note The maximum number of callback timers that can be 
- *       created is ZMOS_TASK_EVENT_NUM_MAX.
- */
-#ifndef ZMOS_USE_CBTIMERS
-#define ZMOS_USE_CBTIMERS           1
+#if ZM_LED_MAX_NUM > 0
+     
+#if ZM_LED_MAX_NUM > 32
+#error "The leds num no more than 32."
 #endif
-
-/**
- * @brief ZMOS low power management use enable.
- *        1 : enable
- *        0 : disable
- *
- */
-#ifndef ZMOS_USE_LOW_POWER
-#define ZMOS_USE_LOW_POWER          0
+/* ZM led blink enable */
+#define ZM_LED_BLINK
+     
 #endif
+/**********************End of zm led dirver config*****************/
     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
@@ -81,4 +68,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-#endif /* ZMOS_Config.h */
+#endif /* zm_driverConfig.h */

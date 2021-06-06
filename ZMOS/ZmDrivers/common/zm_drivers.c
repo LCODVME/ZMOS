@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS_Tasks.c
+* zm_drivers.c
 *
 * DESCRIPTION:
-*     ZMOS task driver
+*     Based on the ZMOS system driver.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/6/1
 * REVISION:
 *     v0.1
 *
@@ -21,10 +21,13 @@
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Tasks.h"
-#include "ZMOS_Memory.h"
 #include "ZMOS.h"
+#include "zm_driverConfig.h"
+#include "zm_drivers.h"
+
+#if ZM_LED_MAX_NUM > 0
+#include "zm_led.h"
+#endif
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -36,21 +39,11 @@
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-/**
- * Task link list.
- */
-typedef struct zmosTaskList_T
-{
-    zmos_task_t taskHandle;
-    struct zmosTaskList_T *next;
-}zmosTaskList_t;
+ 
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-/* Task list head */
-static zmosTaskList_t *taskListHead = NULL;
-/* Index of active task */
-static zmos_taskHandle_t activeTask = NULL;
+static zmos_taskHandle_t driverTaskHandle;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -62,242 +55,121 @@ static zmos_taskHandle_t activeTask = NULL;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-static zmos_taskHandle_t zmos_getReadyTask(void);
+static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+#if ZM_LED_MAX_NUM > 0 && (defined ZM_LED_BLINK)
+extern void zm_updateLedBlink(void);
+#endif
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
-
 /*****************************************************************
-* FUNCTION: zmos_taskThreadRegister
+* FUNCTION: zmDriverInit
 *
 * DESCRIPTION:
-*     Register task thread to ZMOS.
+*     ZM drvers initialize
 * INPUTS:
-*     pTaskHandle : The handle of the task.
-*     taskFunc : Task function.
+*     null
 * RETURNS:
-*     0 : Success (ZMOS_TASK_SUCCESS).
-*     other : ref ZMOS task return cordes.
+*     null
 * NOTE:
-*     It supports a maximum of 255 tasks.
+*     null
 *****************************************************************/
-taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskFunction_t taskFunc)
+void zmDriverInit(void)
 {
-    if(!taskFunc) return ZMOS_TASK_ERROR_PARAM;
-    
-    zmosTaskList_t *newTask;
-    zmosTaskList_t *srchTask;
-    zmosTaskList_t *prevTask;
-    
-    srchTask = taskListHead;
-    
-    while(srchTask)
-    {
-        //Whether task is registered.
-        if(srchTask->taskHandle.taskFunc == taskFunc)
-        {
-            if(pTaskHandle != NULL)
-            {
-                *pTaskHandle = &srchTask->taskHandle;
-            }
-            return ZMOS_TASK_SUCCESS;
-        }
-        prevTask = srchTask;
-        srchTask = srchTask->next;
-    }
-    
-    newTask = (zmosTaskList_t *)zmos_mem_malloc(sizeof(zmosTaskList_t));
-    if(newTask)
-    {
-        newTask->next = NULL;
-        newTask->taskHandle.event = 0;
-        newTask->taskHandle.taskFunc = taskFunc;
-        
-        /* Add to the linked list */
-        if(taskListHead)
-        {
-            prevTask->next = newTask;
-        }
-        else taskListHead = newTask;
-        
-        if(pTaskHandle != NULL)
-        {
-            *pTaskHandle = &newTask->taskHandle;
-        }
-        
-        return ZMOS_TASK_SUCCESS;
-    }
-    return ZMOS_TASK_FAILD;
+    //Register task in ZMOS
+    zmos_taskThreadRegister(&driverTaskHandle, zmDriverPorcessEvent);
+    /* ZM led */
+#if ZM_LED_MAX_NUM > 0
+    zm_ledInit();
+#endif
 }
 /*****************************************************************
-* FUNCTION: zmos_taskThreadLogout
+* FUNCTION: zmDriverPorcessEvent
 *
 * DESCRIPTION:
-*     ZMOS log out the task.
+*     
 * INPUTS:
-*     pTaskHandle : The handle of the task to be deleted.
+*     
 * RETURNS:
 *     null
 * NOTE:
-*    Passing NULL will cause the calling task to be deleted.
-*****************************************************************/
-void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
-{
-    zmosTaskList_t *srchTask;
-    zmosTaskList_t *prevTask;
-    zmos_taskHandle_t pDelTask = pTaskHandle;
-    
-    if(pDelTask == NULL)
-    {
-        pDelTask = activeTask;
-    }
-    
-    srchTask = taskListHead;
-    
-    while(srchTask)
-    {
-        if(&srchTask->taskHandle == pDelTask)
-        {
-            break;
-        }
-        prevTask = srchTask;
-        srchTask = srchTask->next;
-    }
-    if(srchTask)
-    {
-        if(srchTask == taskListHead)
-        {
-            taskListHead = taskListHead->next;
-        }
-        else
-        {
-            prevTask->next = srchTask->next;
-        }
-        zmos_mem_free(srchTask);
-    }
-}
-
-/*****************************************************************
-* FUNCTION: zmos_setTaskEvent
-*
-* DESCRIPTION:
-*     This function to set task event.
-* INPUTS:
-*     pTaskHandle : The handle of the task to set event.
-*     events : what event to set.
-* RETURNS:
-*     0 : Success (ZMOS_TASK_SUCCESS).
-*     other : ref ZMOS task return cordes.
-* NOTE:
 *     null
 *****************************************************************/
-taskReslt_t zmos_setTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events)
+static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
 {
-    if(pTaskHandle)
+    if(events & ZM_DRIVER_LED_BLINK_EVENT)
     {
-        ZMOS_ENTER_CRITICAL();
-        pTaskHandle->event |= events;
-        ZMOS_EXIT_CRITICAL();
-        return ZMOS_TASK_SUCCESS;
+#ifdef ZM_LED_BLINK
+        zm_updateLedBlink();
+#endif
+        return events ^ ZM_DRIVER_LED_BLINK_EVENT;
     }
-    return ZMOS_TASK_ERROR_PARAM;
-}
-
-/*****************************************************************
-* FUNCTION: zmos_clearTaskEvent
-*
-* DESCRIPTION:
-*     This function to clear task event.
-* INPUTS:
-*     pTaskHandle : The handle of the task to clear event.
-*     events : what event to clear.
-* RETURNS:
-*     0 : Success (ZMOS_TASK_SUCCESS).
-*     other : ref ZMOS task return cordes.
-* NOTE:
-*     null
-*****************************************************************/
-taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events)
-{
-    if(pTaskHandle)
-    {
-        ZMOS_ENTER_CRITICAL();
-        pTaskHandle->event &= ~events;
-        ZMOS_EXIT_CRITICAL();
-        return ZMOS_TASK_SUCCESS;
-    }
-    return ZMOS_TASK_ERROR_PARAM;
+    
+    return 0;
 }
 /*****************************************************************
-* FUNCTION: zmos_taskStartScheduler
+* FUNCTION: zmDriverSetEvent
 *
 * DESCRIPTION:
-*     This function performs task scheduling.
+*     This function set event in drver process.
 * INPUTS:
-*     null
+*     events : The event to set.
 * RETURNS:
-*     null
+*     0 : success.
 * NOTE:
-*     Shouldn't be called from anywhere else.
+*     null
 *****************************************************************/
-void zmos_taskStartScheduler(void)
+taskReslt_t zmDriverSetEvent(uTaskEvent_t events)
 {
-    zmos_taskHandle_t pNextTask;
-        
-    pNextTask = zmos_getReadyTask();
-    
-    if(pNextTask)
+    return zmos_setTaskEvent(driverTaskHandle, events);
+}
+/*****************************************************************
+* FUNCTION: zmDriverSetTimerEvent
+*
+* DESCRIPTION:
+*     This function start an event timer.
+* INPUTS:
+*     events : The event to set.
+*     timeout : timeout.
+*     reload : Is reload timer.
+*              true : reload timer.
+*              false : single timer.
+* RETURNS:
+*     0 : success.
+* NOTE:
+*     If the event timer already exists, Timeout and Reload 
+*     properties will be updated.
+*****************************************************************/
+timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload)
+{
+    if(reload)
     {
-        uTaskEvent_t events;
-        
-        ZMOS_ENTER_CRITICAL();
-        events = pNextTask->event;
-        pNextTask->event = 0;
-        ZMOS_EXIT_CRITICAL();
-        
-        activeTask = pNextTask;
-        events = pNextTask->taskFunc(events);
-        activeTask = NULL;
-        
-        ZMOS_ENTER_CRITICAL();
-        pNextTask->event |= events;
-        ZMOS_EXIT_CRITICAL();
+        return zmos_startReloadTimer(driverTaskHandle, events, timeout);
+    }
+    else
+    {
+        return zmos_startSingleTimer(driverTaskHandle, events, timeout);
     }
 }
-
 /*****************************************************************
-* FUNCTION: zmos_getReadyTask
+* FUNCTION: zmDriverStopTimerEvent
 *
 * DESCRIPTION:
-*     ZMOS Get the registered ready task.
+*     This function stop an event timer.
 * INPUTS:
-*     null
+*     events : The event to stop.
 * RETURNS:
-*     Task handle.
+*     0 : success.
+*     other : The timer doesn't exist.
 * NOTE:
 *     null
 *****************************************************************/
-static zmos_taskHandle_t zmos_getReadyTask(void)
+timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events)
 {
-    zmosTaskList_t *srchTask;
-    zmos_task_t *task = NULL;
-    
-    srchTask = taskListHead;
-    
-    while(srchTask)
-    {
-        if(srchTask->taskHandle.event)
-        {
-            task = &srchTask->taskHandle;
-            break;
-        }
-        srchTask = srchTask->next;
-    }
-    return (zmos_taskHandle_t)task;
+    return zmos_stopTimer(driverTaskHandle, events);
 }
 
 /****************************************************** END OF FILE ******************************************************/

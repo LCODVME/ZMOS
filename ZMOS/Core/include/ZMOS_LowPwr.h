@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.h
+* ZMOS_LowPwr.h
 *
 * DESCRIPTION:
-*     ZMOS
+*     ZMOS low power management function.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/5/31
 * REVISION:
 *     v0.1
 *
@@ -17,8 +17,8 @@
 * $Log:$
 *
 *****************************************************************/
-#ifndef __ZMOS_H__
-#define __ZMOS_H__
+#ifndef __ZMOS_LOWPWR_H__
+#define __ZMOS_LOWPWR_H__
  
 #ifdef __cplusplus
 extern "C"
@@ -27,16 +27,11 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Cbtimer.h"
-#include "ZMOS_Tasks.h"
-#include "ZMOS_LowPwr.h"
+#include "ZMOS_Types.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_ENTER_CRITICAL()   zmos_sysEnterCritical()
-#define ZMOS_EXIT_CRITICAL()    zmos_sysExitCritical()
+ 
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -44,15 +39,19 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
- 
+typedef enum
+{
+    LOWPWR_ENABLE,     ///< Allow access to low power.
+    LOWPWR_DISABLE     ///< Do not enter low power.
+}zmos_lowPwrEvt_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: zmos_lowPwrMgrInit
 *
 * DESCRIPTION:
-*     System enter critical.
+*     ZMOS initialize the low power management system.
 * INPUTS:
 *     null
 * RETURNS:
@@ -60,49 +59,23 @@ extern "C"
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void);
+void zmos_lowPwrMgrInit(void);
 /*****************************************************************
-* FUNCTION: zmos_sysExitCritical
+* FUNCTION: zmos_lowPwrSetEvent
 *
 * DESCRIPTION:
-*     System exit critical.
+*     This function to set low power event.
 * INPUTS:
-*     null
+*     event : Low power operation events bit(use 0 ~ 30).
+*     opt : Enable or disable enter low power mode(@ref zmos_lowPwrEvt_t).
 * RETURNS:
 *     null
 * NOTE:
-*     null
+*     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_sysExitCritical(void);
-/*****************************************************************
-* FUNCTION: zmos_system_init
-*
-* DESCRIPTION:
-*     ZMOS system initialize.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_system_init(void);
-/*****************************************************************
-* FUNCTION: zmos_system_start
-*
-* DESCRIPTION:
-*     ZMOS system run start
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
-*****************************************************************/
-void zmos_system_start(void);
+void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ZMOS.h */
+#endif /* ZMOS_LowPwr.h */

@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.h
+* bsp_lpm.h
 *
 * DESCRIPTION:
-*     ZMOS
+*     Low power management bsp.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/5/31
 * REVISION:
 *     v0.1
 *
@@ -17,26 +17,17 @@
 * $Log:$
 *
 *****************************************************************/
-#ifndef __ZMOS_H__
-#define __ZMOS_H__
+#ifndef __BSP_LPM_H__
+#define __BSP_LPM_H__
  
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 /*************************************************************************************************************************
- *                                                       INCLUDES                                                        *
- *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Cbtimer.h"
-#include "ZMOS_Tasks.h"
-#include "ZMOS_LowPwr.h"
-/*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_ENTER_CRITICAL()   zmos_sysEnterCritical()
-#define ZMOS_EXIT_CRITICAL()    zmos_sysExitCritical()
+ 
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -49,23 +40,25 @@ extern "C"
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: bsp_lowPwrEnterBefore
 *
 * DESCRIPTION:
-*     System enter critical.
+*     This function is called before entering low power.
 * INPUTS:
-*     null
+*     timeout : zmos timer next timeout.
+*               A value of 0xFFFFFFFF indicates 
+*               that no timer is running.
 * RETURNS:
 *     null
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void);
+void bsp_lowPwrEnterBefore(uint32_t timeout);
 /*****************************************************************
-* FUNCTION: zmos_sysExitCritical
+* FUNCTION: bsp_systemEnterLpm
 *
 * DESCRIPTION:
-*     System exit critical.
+*     This function put the cpu enter low power mode.
 * INPUTS:
 *     null
 * RETURNS:
@@ -73,12 +66,15 @@ void zmos_sysEnterCritical(void);
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysExitCritical(void);
+void bsp_systemEnterLpm(void);
 /*****************************************************************
-* FUNCTION: zmos_system_init
+* FUNCTION: bsp_lowPwrExitAfter
 *
 * DESCRIPTION:
-*     ZMOS system initialize.
+*     This function is called after exiting low power.
+*     According to the MCU characteristics of low-power 
+*     wake up processing, such as: initialization clock, 
+*     clock compensation, etc.
 * INPUTS:
 *     null
 * RETURNS:
@@ -86,23 +82,9 @@ void zmos_sysExitCritical(void);
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_system_init(void);
-/*****************************************************************
-* FUNCTION: zmos_system_start
-*
-* DESCRIPTION:
-*     ZMOS system run start
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
-*****************************************************************/
-void zmos_system_start(void);
+void bsp_lowPwrExitAfter(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ZMOS.h */
+#endif /* bsp_lpm.h */

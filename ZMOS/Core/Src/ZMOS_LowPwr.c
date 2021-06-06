@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.c
+* ZMOS_LowPwr.c
 *
 * DESCRIPTION:
-*     ZMOS
+*     ZMOS low power management function.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/5/31
 * REVISION:
 *     v0.1
 *
@@ -21,12 +21,12 @@
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Tasks.h"
-#include "bsp_clock.h"
-#include "bsp.h"
 #include "ZMOS.h"
+#include "ZMOS_Timers.h"
+#include "bsp_lpm.h"
+#include "ZMOS_LowPwr.h"
+     
+#if ZMOS_USE_LOW_POWER
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -42,8 +42,7 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-/* ZMOS nesting variable */
-static uint16_t zmosCriticalNesting = 0xCCCC;
+static uint32_t zmos_lowPwrEvents = 0;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -55,10 +54,7 @@ static uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-extern void zmos_taskStartScheduler(void);
-#if ZMOS_USE_LOW_POWER
-extern void zmos_lowPowerManagement(void);
-#endif
+ 
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -67,10 +63,10 @@ extern void zmos_lowPowerManagement(void);
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_systemClockUpdate
+* FUNCTION: zmos_lowPwrMgrInit
 *
 * DESCRIPTION:
-*     Update system clock.
+*     ZMOS initialize the low power management system.
 * INPUTS:
 *     null
 * RETURNS:
@@ -78,114 +74,73 @@ extern void zmos_lowPowerManagement(void);
 * NOTE:
 *     null
 *****************************************************************/
-static void zmos_systemClockUpdate(void)
+void zmos_lowPwrMgrInit(void)
 {
-    uint32_t zmos_clock;
-    uint32_t clockCnt;
-    
-    //Get the clock count of timer ticks.
-    clockCnt = bsp_getClockCount();
-    zmos_clock = zmos_getTimerClock();
-    
-    if(zmos_clock != clockCnt)
+    zmos_lowPwrEvents = 0;
+}
+/*****************************************************************
+* FUNCTION: zmos_lowPwrSetEvent
+*
+* DESCRIPTION:
+*     This function to set low power event.
+* INPUTS:
+*     event : Low power operation events bit(use 0 ~ 30).
+*     opt : Enable or disable enter low power mode(@ref zmos_lowPwrEvt_t).
+* RETURNS:
+*     null
+* NOTE:
+*     The bit 31 use by zmos system.
+*****************************************************************/
+void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt)
+{
+    if(event < 32)
     {
-        zmos_timeTickUpdate(clockCnt - zmos_clock);
+        switch(opt)
+        {
+        case LOWPWR_ENABLE:
+            zmos_lowPwrEvents &= BC(event);
+            break;
+        case LOWPWR_DISABLE:
+            zmos_lowPwrEvents |= BS(event);
+            break;
+        default :
+            break;
+        }
     }
 }
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: zmos_lowPowerManagement
 *
 * DESCRIPTION:
-*     System enter critical.
+*     This function is for power management.
 * INPUTS:
 *     null
 * RETURNS:
 *     null
 * NOTE:
-*     null
+*     Shouldn't be called from anywhere else.
 *****************************************************************/
-void zmos_sysEnterCritical(void)
+void zmos_lowPowerManagement(void)
 {
-    bsp_mcuDisableInterrupt();
-    
-    zmosCriticalNesting++;
-}
-/*****************************************************************
-* FUNCTION: zmos_sysExitCritical
-*
-* DESCRIPTION:
-*     System exit critical.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_sysExitCritical(void)
-{
-    if(zmosCriticalNesting && --zmosCriticalNesting == 0)
+    uint32_t nextTimeout;
+    // When no event runs
+    if(zmos_lowPwrEvents == 0)
     {
-        bsp_mcuEnableInterrupt();
+        ZMOS_ENTER_CRITICAL();
+        // Get next timeout
+        nextTimeout  = zmos_getNextLowestTimeout();
+        ZMOS_EXIT_CRITICAL();
+        //Processing before entering low power
+        bsp_lowPwrEnterBefore(nextTimeout);
+        //Enter low power
+        bsp_systemEnterLpm();
+        //Processing after low power
+        bsp_lowPwrExitAfter();
     }
 }
-/*****************************************************************
-* FUNCTION: zmos_system_init
-*
-* DESCRIPTION:
-*     ZMOS system initialize.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_system_init(void)
-{
-    // Initialize bsp
-    bsp_init();
-    // Initialize zmos timer
-    zmos_timerInit();
-    
-#if ZMOS_USE_CBTIMERS > 0
-    // Initialize the callback timer
-    zmos_cbTimerInit();
+#else
+void zmos_lowPwrMgrInit(void) {}
+void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt) {}
+void zmos_lowPowerManagement(void) {}
 #endif
-    
-#if ZMOS_USE_LOW_POWER
-    // Initialize the power management system
-    zmos_lowPwrMgrInit();
-#endif
-    //Initialize critical nesting
-    zmosCriticalNesting = 0;
-}
-
-/*****************************************************************
-* FUNCTION: zmos_system_start
-*
-* DESCRIPTION:
-*     ZMOS system run start
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
-*****************************************************************/
-void zmos_system_start(void)
-{
-    while(1)
-    {
-        zmos_systemClockUpdate();
-        //ZMOS start a task schedule
-        zmos_taskStartScheduler();
-        
-#if ZMOS_USE_LOW_POWER
-        // Put the processor/system into sleep
-        zmos_lowPowerManagement();
-#endif
-    }
-}
 /****************************************************** END OF FILE ******************************************************/
