@@ -53,7 +53,9 @@ typedef struct
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
+/* Callback timer task handle */
 static zmos_taskHandle_t cbTimerTaskHandle;
+/* Callback timer table */
 static zmos_cbTimer_t cbTimers[ZMOS_USE_CBTIMERS_NUM];
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
@@ -79,7 +81,7 @@ static timerReslt_t zmos_addCbTimer(cbTimerId_t *timerId, void *param, cbTimerFu
 * FUNCTION: zmos_cbTimerInit
 *
 * DESCRIPTION:
-*     ZMOS callback timer initialize
+*     ZMOS callback timer initialize.
 * INPUTS:
 *     null
 * RETURNS:
