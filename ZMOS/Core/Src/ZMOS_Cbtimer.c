@@ -26,17 +26,15 @@
 #include "ZMOS_Cbtimer.h"
 #include <string.h>
 
-#if ZMOS_USE_CBTIMERS > 0
+#if ZMOS_USE_CBTIMERS_NUM > 0
+
+#if (ZMOS_USE_CBTIMERS_NUM > ZMOS_TASK_EVENT_NUM_MAX)
+#error "ZMOS_USE_CBTIMERS_NUM cannot exceed ZMOS_TASK_EVENT_NUM_MAX!"
+#endif
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#if (ZMOS_TASK_EVENT_NUM_MAX <= 8)
-    #define ZMOS_CBTIMER_NUM    8
-#elif (ZMOS_TASK_EVENT_NUM_MAX <= 16)
-    #define ZMOS_CBTIMER_NUM    16
-#else
-    #define ZMOS_CBTIMER_NUM    32
-#endif
+
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -56,7 +54,7 @@ typedef struct
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
 static zmos_taskHandle_t cbTimerTaskHandle;
-static zmos_cbTimer_t cbTimers[ZMOS_CBTIMER_NUM];
+static zmos_cbTimer_t cbTimers[ZMOS_USE_CBTIMERS_NUM];
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -91,7 +89,7 @@ static timerReslt_t zmos_addCbTimer(cbTimerId_t *timerId, void *param, cbTimerFu
 *****************************************************************/
 void zmos_cbTimerInit(void)
 {
-    memset(cbTimers, 0, ZMOS_CBTIMER_NUM * sizeof(zmos_cbTimer_t));
+    memset(cbTimers, 0, ZMOS_USE_CBTIMERS_NUM * sizeof(zmos_cbTimer_t));
     zmos_taskThreadRegister(&cbTimerTaskHandle, zmos_cbTImerTaskProcess);
 }
 /*****************************************************************
@@ -175,7 +173,7 @@ timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 *****************************************************************/
 timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout)
 {
-    if(timerId < ZMOS_CBTIMER_NUM)
+    if(timerId < ZMOS_USE_CBTIMERS_NUM)
     {
         if(cbTimers[timerId].timerFunc)
         {
@@ -202,7 +200,7 @@ timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout)
 *****************************************************************/
 timerReslt_t zmos_stopCbtimer(cbTimerId_t timerId)
 {
-    if(timerId < ZMOS_CBTIMER_NUM)
+    if(timerId < ZMOS_USE_CBTIMERS_NUM)
     {
         if(cbTimers[timerId].timerFunc)
         {
@@ -229,7 +227,7 @@ static uTaskEvent_t zmos_cbTImerTaskProcess(uTaskEvent_t event)
 {
     if(event)
     {
-        for(uTaskEvent_t i = 0; i < ZMOS_CBTIMER_NUM && event; i++)
+        for(uTaskEvent_t i = 0; i < ZMOS_USE_CBTIMERS_NUM && event; i++)
         {
             if(event & BS(i))
             {
@@ -268,7 +266,7 @@ static timerReslt_t zmos_addCbTimer(cbTimerId_t *timerId, void *param, cbTimerFu
 {
     if(cbfunc == NULL) return ZMOS_TIMER_FAILD;
     
-    for(cbTimerId_t i = 0; i < ZMOS_CBTIMER_NUM; i++)
+    for(cbTimerId_t i = 0; i < ZMOS_USE_CBTIMERS_NUM; i++)
     {
         if(cbTimers[i].timerFunc == NULL)
         {

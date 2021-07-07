@@ -148,7 +148,7 @@ void zmos_system_init(void)
     // Initialize zmos timer
     zmos_timerInit();
     
-#if ZMOS_USE_CBTIMERS > 0
+#if ZMOS_USE_CBTIMERS_NUM > 0
     // Initialize the callback timer
     zmos_cbTimerInit();
 #endif
