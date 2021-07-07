@@ -117,6 +117,21 @@ taskReslt_t zmos_setTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events
 *     null
 *****************************************************************/
 taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events);
+/*****************************************************************
+* FUNCTION: zmos_getCurrentTaskHandle
+*
+* DESCRIPTION:
+*     This function to gets the handle to the current task.
+* INPUTS:
+*     null
+* RETURNS:
+*     Current task handle.
+*     NULL : No tasks are currently running.
+* NOTE:
+*     null
+*****************************************************************/
+zmos_taskHandle_t zmos_getCurrentTaskHandle(void);
+
 
 #ifdef __cplusplus
 }

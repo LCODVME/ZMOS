@@ -67,7 +67,14 @@ extern "C"
 #define ZM_LED_22  BS(21)
 #define ZM_LED_23  BS(22)
 #define ZM_LED_24  BS(23)
-
+#define ZM_LED_25  BS(24)
+#define ZM_LED_26  BS(25)
+#define ZM_LED_27  BS(26)
+#define ZM_LED_28  BS(27)
+#define ZM_LED_29  BS(28)
+#define ZM_LED_30  BS(29)
+#define ZM_LED_31  BS(30)
+#define ZM_LED_32  BS(31)
 #endif //(ZM_LED_MAX_NUM > 8)
 #endif // (ZM_LED_MAX_NUM > 16)
 /*************************************************************************************************************************

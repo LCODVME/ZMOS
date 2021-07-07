@@ -233,6 +233,23 @@ taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
     return ZMOS_TASK_ERROR_PARAM;
 }
 /*****************************************************************
+* FUNCTION: zmos_getCurrentTaskHandle
+*
+* DESCRIPTION:
+*     This function to gets the handle to the current task.
+* INPUTS:
+*     null
+* RETURNS:
+*     Current task handle.
+*     NULL : No tasks are currently running.
+* NOTE:
+*     null
+*****************************************************************/
+zmos_taskHandle_t zmos_getCurrentTaskHandle(void)
+{
+    return activeTask;
+}
+/*****************************************************************
 * FUNCTION: zmos_taskStartScheduler
 *
 * DESCRIPTION:

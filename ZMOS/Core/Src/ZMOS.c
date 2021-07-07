@@ -148,7 +148,7 @@ void zmos_system_init(void)
     // Initialize zmos timer
     zmos_timerInit();
     
-#if ZMOS_USE_CBTIMERS > 0
+#if ZMOS_USE_CBTIMERS_NUM > 0
     // Initialize the callback timer
     zmos_cbTimerInit();
 #endif
@@ -165,7 +165,7 @@ void zmos_system_init(void)
 * FUNCTION: zmos_system_start
 *
 * DESCRIPTION:
-*     ZMOS system run start
+*     ZMOS system run start.
 * INPUTS:
 *     null
 * RETURNS:
@@ -178,14 +178,33 @@ void zmos_system_start(void)
 {
     while(1)
     {
-        zmos_systemClockUpdate();
-        //ZMOS start a task schedule
-        zmos_taskStartScheduler();
-        
-#if ZMOS_USE_LOW_POWER
-        // Put the processor/system into sleep
-        zmos_lowPowerManagement();
-#endif
+        /* Loop run zmos system */
+        zmos_system_run();
     }
 }
+
+/*****************************************************************
+* FUNCTION: zmos_system_run
+*
+* DESCRIPTION:
+*     This function is used to schedule once task.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_system_run(void)
+{
+    zmos_systemClockUpdate();
+    //ZMOS start a task schedule
+    zmos_taskStartScheduler();
+    
+#if ZMOS_USE_LOW_POWER
+    // Put the processor/system into sleep
+    zmos_lowPowerManagement();
+#endif
+}
+
 /****************************************************** END OF FILE ******************************************************/

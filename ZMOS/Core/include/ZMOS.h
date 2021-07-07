@@ -101,6 +101,19 @@ void zmos_system_init(void);
 *     This Function doesn't return.
 *****************************************************************/
 void zmos_system_start(void);
+/*****************************************************************
+* FUNCTION: zmos_system_run
+*
+* DESCRIPTION:
+*     This function is used to schedule once tasks.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_system_run(void);
 
 #ifdef __cplusplus
 }

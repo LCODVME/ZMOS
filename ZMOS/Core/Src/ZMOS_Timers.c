@@ -190,7 +190,7 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
     return 0;
 }
 /*****************************************************************
-* FUNCTION: zmos_getReloadTime
+* FUNCTION: zmos_getReloadTimeout
 *
 * DESCRIPTION:
 *     Get timer reload time.

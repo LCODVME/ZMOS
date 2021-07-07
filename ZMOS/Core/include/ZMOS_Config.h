@@ -45,15 +45,15 @@ extern "C"
 #endif
     
 /**
- * @brief ZMOS callback timer use enable.
- *        1 : enable
- *        0 : disable
+ * @brief Number of ZMOS callback timers used.
+ *        0 : disable.
+ * 
  *
  * @note The maximum number of callback timers that can be 
- *       created is ZMOS_TASK_EVENT_NUM_MAX.
+ *       created is no more than ZMOS_TASK_EVENT_NUM_MAX.
  */
-#ifndef ZMOS_USE_CBTIMERS
-#define ZMOS_USE_CBTIMERS           1
+#ifndef ZMOS_USE_CBTIMERS_NUM
+#define ZMOS_USE_CBTIMERS_NUM       8
 #endif
 
 /**
