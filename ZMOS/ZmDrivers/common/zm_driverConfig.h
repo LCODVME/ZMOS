@@ -52,6 +52,34 @@ extern "C"
      
 #endif
 /**********************End of zm led dirver config*****************/
+     
+     
+/*******************************************************************
+ *  ZM key driver config.
+ */
+/**
+ * @brief ZM key drivers maximum support keys is the number.
+ *        0 : ZM key drivers are not used.
+ *
+ * @note No more than 32.
+ *       The larger the value, the more space it takes up.
+ */
+#ifndef ZM_KEY_MAX_NUM
+#define ZM_KEY_MAX_NUM          4
+#endif
+    
+#if ZM_KEY_MAX_NUM > 0
+     
+#if ZM_KEY_MAX_NUM > 32
+#error "The keys num no more than 32."
+#endif
+/* Long press enable */
+#define ZM_KEY_LONG_PRESS
+/* Key press debounce */
+#define ZM_KEY_PRESS_DEBOUNCE   20
+     
+#endif
+/**********************End of zm key dirver config*****************/
     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *

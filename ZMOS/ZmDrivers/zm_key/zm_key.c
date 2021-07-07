@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* zm_drivers.c
+* zm_key.c
 *
 * DESCRIPTION:
-*     Based on the ZMOS system driver.
+*     zm key driver.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/6/1
+*     2021/6/7
 * REVISION:
 *     v0.1
 *
@@ -22,16 +22,11 @@
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
 #include "ZMOS.h"
-#include "zm_driverConfig.h"
 #include "zm_drivers.h"
-
-#if ZM_LED_MAX_NUM > 0
-#include "zm_led.h"
-#endif
+#include <string.h>
+#include "zm_key.h"
 
 #if ZM_KEY_MAX_NUM > 0
-#include "zm_key.h"
-#endif
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -43,11 +38,17 @@
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
- 
+typedef struct
+{
+    uint8_t active;
+    zmKeyEvent_t event;
+    zmKeyEventCb funcCb;
+}zmKeyStatus_t;
+
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-static zmos_taskHandle_t driverTaskHandle;
+static zmKeyStatus_t keyStatusTable[ZM_KEY_MAX_NUM];
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -59,27 +60,19 @@ static zmos_taskHandle_t driverTaskHandle;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events);
+ 
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-/* Led */
-#if ZM_LED_MAX_NUM > 0 && (defined ZM_LED_BLINK)
-extern void zm_updateLedBlink(void);
-#endif
-/* Key */
-#if ZM_KEY_MAX_NUM > 0
-void zm_keyPollProcess(void);
-#endif
-
+ 
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmDriverInit
+* FUNCTION: zm_keyInit
 *
 * DESCRIPTION:
-*     ZM drvers initialize
+*     key driver initialize.
 * INPUTS:
 *     null
 * RETURNS:
@@ -87,107 +80,115 @@ void zm_keyPollProcess(void);
 * NOTE:
 *     null
 *****************************************************************/
-void zmDriverInit(void)
+void zm_keyInit(void)
 {
-    //Register task in ZMOS
-    zmos_taskThreadRegister(&driverTaskHandle, zmDriverPorcessEvent);
-    /* ZM led */
-#if ZM_LED_MAX_NUM > 0
-    zm_ledInit();
-#endif
+    memset(keyStatusTable, 0, sizeof(zmKeyStatus_t) * ZM_KEY_MAX_NUM);
 }
 /*****************************************************************
-* FUNCTION: zmDriverPorcessEvent
+* FUNCTION: zm_keyRegister
 *
 * DESCRIPTION:
-*     
+*     This function to register key.
+*     When key was pressed, callback will be call.
 * INPUTS:
-*     
+*     key : Bit mask value of keys to register.
+*     keyActive : The level at which the key is pressed.
+*                 0 : active low.
+*                 1 : active high.
+*     keyCallback £º key callback function.
 * RETURNS:
 *     null
 * NOTE:
 *     null
 *****************************************************************/
-static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
+void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, zmKeyEventCb keyCallback)
 {
+    if(keys >= BS(ZM_KEY_MAX_NUM)) return;
+    zmKeyType_t key;
+    zmKeyStatus_t *stu;
     
-    if(events & ZM_DRIVER_LED_BLINK_EVENT)
-    {
-#ifdef ZM_LED_BLINK
-        zm_updateLedBlink();
-#endif
-        return events ^ ZM_DRIVER_LED_BLINK_EVENT;
-    }
+    key = ZM_KEY_1;
+    stu = keyStatusTable;
     
-    if(events & ZM_DRIVER_KEY_POLL_EVENT)
+    while(keys)
     {
-#if ZM_KEY_MAX_NUM > 0
-        zm_keyPollProcess();
-#endif
-        return events ^ ZM_DRIVER_KEY_POLL_EVENT;
+        if(keys & key)
+        {
+            stu->active = keyActive;
+            stu->funcCb = keyCallback;
+            memset(stu, 0, sizeof(zmKeyStatus_t));
+            keys ^= key;
+        }
+        key <<= 1;
+        stu++;
     }
-    return 0;
 }
 /*****************************************************************
-* FUNCTION: zmDriverSetEvent
+* FUNCTION: zm_keyPollStart
 *
 * DESCRIPTION:
-*     This function set event in drver process.
+*     This function to start key poll.
 * INPUTS:
-*     events : The event to set.
+*     period : key poll period.
 * RETURNS:
-*     0 : success.
+*     null
 * NOTE:
 *     null
 *****************************************************************/
-taskReslt_t zmDriverSetEvent(uTaskEvent_t events)
+void zm_keyPollStart(uint32_t period)
 {
-    return zmos_setTaskEvent(driverTaskHandle, events);
+    zmDriverSetTimerEvent(ZM_DRIVER_KEY_POLL_EVENT, period, true);
 }
 /*****************************************************************
-* FUNCTION: zmDriverSetTimerEvent
+* FUNCTION: zm_keyPollStop
 *
 * DESCRIPTION:
-*     This function start an event timer.
+*     This function to stop key poll.
 * INPUTS:
-*     events : The event to set.
-*     timeout : timeout.
-*     reload : Is reload timer.
-*              true : reload timer.
-*              false : single timer.
+*     null
 * RETURNS:
-*     0 : success.
-* NOTE:
-*     If the event timer already exists, Timeout and Reload 
-*     properties will be updated.
-*****************************************************************/
-timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload)
-{
-    if(reload)
-    {
-        return zmos_startReloadTimer(driverTaskHandle, events, timeout);
-    }
-    else
-    {
-        return zmos_startSingleTimer(driverTaskHandle, events, timeout);
-    }
-}
-/*****************************************************************
-* FUNCTION: zmDriverStopTimerEvent
-*
-* DESCRIPTION:
-*     This function stop an event timer.
-* INPUTS:
-*     events : The event to stop.
-* RETURNS:
-*     0 : success.
-*     other : The timer doesn't exist.
+*     null
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events)
+void zm_keyPollStop(void)
 {
-    return zmos_stopTimer(driverTaskHandle, events);
+    zmDriverStopTimerEvent(ZM_DRIVER_KEY_POLL_EVENT);
 }
+/*****************************************************************
+* FUNCTION: zm_keyPollProcess
+*
+* DESCRIPTION:
+*     This function to poll key press.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_keyPollProcess(void)
+{
+    zmKeyType_t key;
+    zmKeyType_t keys;
+    zmKeyStatus_t *stu;
+    
+    key = ZM_KEY_1;
+    keys = BS(ZM_KEY_MAX_NUM) - 1;
+    stu = keyStatusTable;
+    
+    while(keys)
+    {
+        if(keys & key)
+        {
+            
+            keys ^= key;
+        }
+        key <<= 1;
+        stu++;
+    }
+}
+#else
 
+#endif
 /****************************************************** END OF FILE ******************************************************/
