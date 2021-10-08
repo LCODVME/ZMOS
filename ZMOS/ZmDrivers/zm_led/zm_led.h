@@ -84,9 +84,9 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-#if (ZM_LED_MAX_NUM <= 8)
+#if (ZM_LED_MAX_NUM < 8)
 typedef uint8_t zmLedType_t;
-#elif (ZM_LED_MAX_NUM <= 16)
+#elif (ZM_LED_MAX_NUM < 16)
 typedef uint16_t zmLedType_t;
 #else
 typedef uint32_t zmLedType_t;
