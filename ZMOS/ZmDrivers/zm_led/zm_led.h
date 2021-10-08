@@ -84,9 +84,9 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-#if (ZM_LED_MAX_NUM <= 8)
+#if (ZM_LED_MAX_NUM < 8)
 typedef uint8_t zmLedType_t;
-#elif (ZM_LED_MAX_NUM <= 16)
+#elif (ZM_LED_MAX_NUM < 16)
 typedef uint16_t zmLedType_t;
 #else
 typedef uint32_t zmLedType_t;
@@ -96,19 +96,6 @@ typedef uint32_t zmLedType_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-/*****************************************************************
-* FUNCTION: zm_ledInit
-*
-* DESCRIPTION:
-*     Initialize led driver.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zm_ledInit(void);
 /*****************************************************************
 * FUNCTION: zm_ledSet
 *
@@ -141,7 +128,7 @@ void zm_ledOnTime(zmLedType_t leds, uint32_t time);
 * FUNCTION: zm_ledSetBlinkNum
 *
 * DESCRIPTION:
-*     Leds start blink.
+*     Leds start blink a certain number of times.
 * INPUTS:
 *     leds : bit mask value of leds to be set blink.
 *     numBlinks : The number of blinks, 0 is keeps flashing.
@@ -157,7 +144,7 @@ void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uin
 * FUNCTION: zm_ledSetBlinkTime
 *
 * DESCRIPTION:
-*     Leds start blink.
+*     Leds start blink for a certain time.
 * INPUTS:
 *     leds : bit mask value of leds to be set blink.
 *     timeBlinks : Blink time, 0 is keeps flashing.
@@ -169,7 +156,36 @@ void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uin
 *     null
 *****************************************************************/
 void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, uint16_t period);
-
+/*****************************************************************
+* FUNCTION: zmos_ledSetToggleNum
+*
+* DESCRIPTION:
+*     Leds start toggle a certain number of times.
+* INPUTS:
+*     leds : Bit mask value of leds to be set blink.
+*     numToggles : The number of toggle, 0 is keeps flashing.
+*     period : Length of each cycle.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period);
+/*****************************************************************
+* FUNCTION: zm_ledSetToggleTime
+*
+* DESCRIPTION:
+*     Leds start toggle for a certain time.
+* INPUTS:
+*     leds : Bit mask value of leds to be set blink.
+*     timeToggles : Toggle time, 0 is keeps flashing.
+*     period : Length of each cycle.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_ledSetToggleTime(zmLedType_t leds, uint32_t timeToggles, uint16_t period);
 
 #ifdef __cplusplus
 }
