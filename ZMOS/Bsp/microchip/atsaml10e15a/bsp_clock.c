@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.c
+* bsp_clock.c
 *
 * DESCRIPTION:
-*     ZMOS
+*     Provide clock tick for ZMOS.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/6/11
 * REVISION:
 *     v0.1
 *
@@ -21,12 +21,9 @@
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Tasks.h"
+#include "definitions.h"
 #include "bsp_clock.h"
-#include "bsp.h"
-#include "ZMOS.h"
+#include "common.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -42,8 +39,7 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-/* ZMOS nesting variable */
-static uint16_t zmosCriticalNesting = 0xCCCC;
+static uint32_t clockTick = 0;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -55,10 +51,7 @@ static uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-extern void zmos_taskStartScheduler(void);
-#if ZMOS_USE_LOW_POWER
-extern void zmos_lowPowerManagement(void);
-#endif
+ 
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -67,10 +60,10 @@ extern void zmos_lowPowerManagement(void);
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmos_systemClockUpdate
+* FUNCTION: tickUpdate
 *
 * DESCRIPTION:
-*     Update system clock.
+*     null
 * INPUTS:
 *     null
 * RETURNS:
@@ -78,25 +71,15 @@ extern void zmos_lowPowerManagement(void);
 * NOTE:
 *     null
 *****************************************************************/
-static void zmos_systemClockUpdate(void)
+static void tickUpdate(TC_TIMER_STATUS status, uintptr_t context)
 {
-    uint32_t zmos_clock;
-    uint32_t clockCnt;
-    
-    //Get the clock count of timer ticks.
-    clockCnt = bsp_getClockCount();
-    zmos_clock = zmos_getTimerClock();
-    
-    if(zmos_clock != clockCnt)
-    {
-        zmos_timeTickUpdate(clockCnt - zmos_clock);
-    }
+    clockTick++;
 }
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: timerClockWakeupInit
 *
 * DESCRIPTION:
-*     System enter critical.
+*     .
 * INPUTS:
 *     null
 * RETURNS:
@@ -104,107 +87,92 @@ static void zmos_systemClockUpdate(void)
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void)
+void timerClockWakeupInit(void)
 {
-    bsp_mcuDisableInterrupt();
-    
-    zmosCriticalNesting++;
-}
-/*****************************************************************
-* FUNCTION: zmos_sysExitCritical
-*
-* DESCRIPTION:
-*     System exit critical.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_sysExitCritical(void)
-{
-    if(zmosCriticalNesting && --zmosCriticalNesting == 0)
-    {
-        bsp_mcuEnableInterrupt();
-    }
-}
-/*****************************************************************
-* FUNCTION: zmos_system_init
-*
-* DESCRIPTION:
-*     ZMOS system initialize.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_system_init(void)
-{
-    // Initialize bsp
-    bsp_init();
-    // Initialize zmos timer
-    zmos_timerInit();
-    
-#if ZMOS_USE_CBTIMERS_NUM > 0
-    // Initialize the callback timer
-    zmos_cbTimerInit();
-#endif
-    
-#if ZMOS_USE_LOW_POWER
-    // Initialize the power management system
-    zmos_lowPwrMgrInit();
-#endif
-    //Initialize critical nesting
-    zmosCriticalNesting = 0;
-}
+    /* Selection of the Generator and write Lock for TC0 TC1 */
+    GCLK_REGS->GCLK_PCHCTRL[14] = GCLK_PCHCTRL_GEN(0x0)  | GCLK_PCHCTRL_CHEN_Msk;
 
+    while ((GCLK_REGS->GCLK_PCHCTRL[14] & GCLK_PCHCTRL_CHEN_Msk) != GCLK_PCHCTRL_CHEN_Msk)
+    {
+        /* Wait for synchronization */
+    }
+}
 /*****************************************************************
-* FUNCTION: zmos_system_start
+* FUNCTION: timerClockLowPowerInit
 *
 * DESCRIPTION:
-*     ZMOS system run start.
+*     .
 * INPUTS:
 *     null
 * RETURNS:
 *     null
 * NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
+*     null
 *****************************************************************/
-void zmos_system_start(void)
+void timerClockLowPowerInit(void)
 {
-    while(1)
+    /* Selection of the Generator and write Lock for TC0 TC1 */
+    GCLK_REGS->GCLK_PCHCTRL[14] = GCLK_PCHCTRL_GEN(0x2)  | GCLK_PCHCTRL_CHEN_Msk;
+    
+    while ((GCLK_REGS->GCLK_PCHCTRL[14] & GCLK_PCHCTRL_CHEN_Msk) != GCLK_PCHCTRL_CHEN_Msk)
     {
-        /* Loop run zmos system */
-        zmos_system_run();
+        /* Wait for synchronization */
     }
 }
 
 /*****************************************************************
-* FUNCTION: zmos_system_run
+* FUNCTION: bsp_getClockCount
 *
 * DESCRIPTION:
-*     This function is used to schedule once task.
+*     Clock initialize.
 * INPUTS:
 *     null
+* RETURNS:
+*     Clock count.
+* NOTE:
+*     null
+*****************************************************************/
+void bsp_clockInit(void)
+{
+    uint32_t timerPeriod;
+    TC0_TimerStop();
+    timerPeriod = TC0_TimerFrequencyGet() / 1000/*000*/;  // to us
+    //timerPeriod *= SYSTEM_CLOCK_US;
+    TC0_Timer32bitPeriodSet(timerPeriod);
+    TC0_Timer32bitCounterSet(0);
+    TC0_TimerCallbackRegister(tickUpdate, 0);
+    TC0_TimerStart();
+}
+/*****************************************************************
+* FUNCTION: bsp_getClockCount
+*
+* DESCRIPTION:
+*     Get clock count, it provide system clock for ZMOS.
+* INPUTS:
+*     null
+* RETURNS:
+*     Clock count.
+* NOTE:
+*     null
+*****************************************************************/
+uint32_t bsp_getClockCount(void)
+{
+    return clockTick;
+}
+/*****************************************************************
+* FUNCTION: bsp_compensateClockCount
+*
+* DESCRIPTION:
+*     Compensate clock count.
+* INPUTS:
+*     Compensate value.
 * RETURNS:
 *     null
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_system_run(void)
+void bsp_compensateClockCount(uint32_t value)
 {
-    zmos_systemClockUpdate();
-    //ZMOS start a task schedule
-    zmos_taskStartScheduler();
-    
-#if ZMOS_USE_LOW_POWER
-    // Put the processor/system into sleep
-    zmos_lowPowerManagement();
-#endif
+    clockTick += value;
 }
-
 /****************************************************** END OF FILE ******************************************************/

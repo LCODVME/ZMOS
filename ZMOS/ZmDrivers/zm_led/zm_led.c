@@ -203,7 +203,7 @@ void zm_ledOnTime(zmLedType_t leds, uint32_t time)
 * FUNCTION: zm_ledSetBlinkNum
 *
 * DESCRIPTION:
-*     Leds start blink.
+*     Leds start blink a certain number of times.
 * INPUTS:
 *     leds : Bit mask value of leds to be set blink.
 *     numBlinks : The number of blinks, 0 is keeps flashing.
@@ -271,7 +271,7 @@ void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uin
 * FUNCTION: zm_ledSetBlinkTime
 *
 * DESCRIPTION:
-*     Leds start blink.
+*     Leds start blink for a certain time.
 * INPUTS:
 *     leds : Bit mask value of leds to be set blink.
 *     timeBlinks : Blink time, 0 is keeps flashing.
@@ -336,6 +336,134 @@ void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, 
 #endif
 }
 /*****************************************************************
+* FUNCTION: zmos_ledSetToggleNum
+*
+* DESCRIPTION:
+*     Leds start toggle a certain number of times.
+* INPUTS:
+*     leds : Bit mask value of leds to be set blink.
+*     numToggles : The number of toggle, 0 is keeps flashing.
+*     period : Length of each cycle.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period)
+{
+#ifdef ZM_LED_BLINK
+    zmLedType_t led;
+    zmLedControl_t *stu;
+    
+    if(leds >= BS(ZM_LED_MAX_NUM)) return;
+    
+    if (leds && period)
+    {
+        led = ZM_LED_1;
+        stu = zmLedCtrlStatus.ledCtrlTable;
+        
+        while(leds)
+        {
+            if(leds & led)
+            {
+                if(stu->mode < ZM_LED_MODE_TOGGLE)
+                {
+                    //Calc and store the end state of the led
+                    zmPreBlinkState |= (led & (zmLedsState ^ ((BS(ZM_LED_MAX_NUM) - 1) * (numToggles % 2))));
+                }
+                stu->mode = (led & zmLedsState);
+                stu->onPct = 50;
+                stu->period = period;
+                stu->cyc.mode = ZM_CYC_NUM;
+                stu->cyc.u.num = (numToggles + 1) / 2;
+                if(!numToggles)
+                    stu->mode |= ZM_LED_MODE_FLASH;
+                stu->mode |= ZM_LED_MODE_BLINK;
+                stu->next = zmos_getTimerClock();
+                if((stu->mode & ZM_LED_MODE_ON))
+                {
+                    stu->cyc.u.num -= ((numToggles % 2) ? 1 : 0);
+                    if(stu->cyc.u.num)
+                    {
+                        stu->mode ^= ZM_LED_MODE_ON;
+                        zm_ledOnOff(led, stu->mode & ZM_LED_MODE_ON);
+                        stu->next +=(((uint32_t)stu->onPct * (uint32_t)stu->period) / 100);
+                    }
+                }
+                leds ^= led;
+            }
+            led <<= 1;
+            stu++;
+        }
+        zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+    }
+    else
+    {
+        zm_ledOnOff(leds, ZM_LED_MODE_ON);
+    }
+#else
+    
+#endif
+}
+/*****************************************************************
+* FUNCTION: zm_ledSetToggleTime
+*
+* DESCRIPTION:
+*     Leds start toggle for a certain time.
+* INPUTS:
+*     leds : Bit mask value of leds to be set blink.
+*     timeToggles : Toggle time, 0 is keeps flashing.
+*     period : Length of each cycle.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_ledSetToggleTime(zmLedType_t leds, uint32_t timeToggles, uint16_t period)
+{
+#ifdef ZM_LED_BLINK
+    //zmLedType_t led;
+    //zmLedControl_t *stu;
+    
+    if(leds >= BS(ZM_LED_MAX_NUM)) return;
+    
+    zmos_ledSetToggleNum(leds, (timeToggles / period) * 2, period);
+    /*if (leds && period)
+    {
+        led = ZM_LED_1;
+        stu = zmLedCtrlStatus.ledCtrlTable;
+        
+        while(leds)
+        {
+            if(leds & led)
+            {
+                
+                stu->mode = led & zmLedsState;
+                stu->onPct = 50;
+                stu->period = period;
+                stu->cyc.mode = ZM_CYC_TIME;
+                stu->cyc.u.timeout = timeToggles;
+                if(!timeToggles)
+                    stu->mode |= ZM_LED_MODE_FLASH;
+                stu->mode |= ZM_LED_MODE_BLINK;
+                stu->next = zmos_getTimerClock();
+                
+                leds ^= led;
+            }
+            led <<= 1;
+            stu++;
+        }
+        zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+    }
+    else
+    {
+        zm_ledOnOff(leds, ZM_LED_MODE_ON);
+    }*/
+#else
+    
+#endif
+}
+/*****************************************************************
 * FUNCTION: zm_updateLedBlink
 *
 * DESCRIPTION:
@@ -381,7 +509,7 @@ void zm_updateLedBlink(void)
                         {
                             if(stu->cyc.mode == ZM_CYC_NUM)
                             {
-                                if(--stu->cyc.u.num == 0)
+                                if(!stu->cyc.u.num || --stu->cyc.u.num == 0)
                                 {
                                     stu->mode ^= ZM_LED_MODE_BLINK;
                                 }

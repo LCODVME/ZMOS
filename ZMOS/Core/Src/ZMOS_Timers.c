@@ -36,13 +36,13 @@
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-typedef struct
+typedef struct zmos_timer
 {
     uint32_t timeout;
     uint32_t reloadTime;
     zmos_taskHandle_t taskHandle;
     uTaskEvent_t event;
-    void *next;
+    struct zmos_timer *next;
 }zmos_timer_t;
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
@@ -190,7 +190,7 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
     return 0;
 }
 /*****************************************************************
-* FUNCTION: zmos_getReloadTime
+* FUNCTION: zmos_getReloadTimeout
 *
 * DESCRIPTION:
 *     Get timer reload time.

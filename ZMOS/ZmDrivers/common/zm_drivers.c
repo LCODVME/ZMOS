@@ -63,15 +63,12 @@ static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-/* Led */
-#if ZM_LED_MAX_NUM > 0 && (defined ZM_LED_BLINK)
+#if ZM_LED_MAX_NUM > 0
+extern void zm_ledInit(void);
+#ifdef ZM_LED_BLINK
 extern void zm_updateLedBlink(void);
-#endif
-/* Key */
-#if ZM_KEY_MAX_NUM > 0
-void zm_keyPollProcess(void);
-#endif
-
+#endif /* ZM_LED_BLINK */
+#endif /* ZM_LED_MAX_NUM > 0 */
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/

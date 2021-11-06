@@ -1,14 +1,14 @@
 /*****************************************************************
 * Copyright (C) 2021 zm. All rights reserved.                    *
 ******************************************************************
-* ZMOS.c
+* bsp_clock.c
 *
 * DESCRIPTION:
-*     ZMOS
+*     Provide clock tick for ZMOS.
 * AUTHOR:
 *     zm
 * CREATED DATE:
-*     2021/5/16
+*     2021/8/6
 * REVISION:
 *     v0.1
 *
@@ -21,12 +21,8 @@
 /*************************************************************************************************************************
  *                                                       INCLUDES                                                        *
  *************************************************************************************************************************/
-#include "ZMOS_Common.h"
-#include "ZMOS_Timers.h"
-#include "ZMOS_Tasks.h"
+#include "driverlib.h"
 #include "bsp_clock.h"
-#include "bsp.h"
-#include "ZMOS.h"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
@@ -42,8 +38,7 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-/* ZMOS nesting variable */
-static uint16_t zmosCriticalNesting = 0xCCCC;
+static uint32_t clockTicks = 0;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -55,10 +50,7 @@ static uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-extern void zmos_taskStartScheduler(void);
-#if ZMOS_USE_LOW_POWER
-extern void zmos_lowPowerManagement(void);
-#endif
+ 
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -66,145 +58,91 @@ extern void zmos_lowPowerManagement(void);
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
-/*****************************************************************
-* FUNCTION: zmos_systemClockUpdate
-*
-* DESCRIPTION:
-*     Update system clock.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-static void zmos_systemClockUpdate(void)
+static void setTimerTimeout(uint32_t time_ms)
 {
-    uint32_t zmos_clock;
-    uint32_t clockCnt;
+    uint16_t timePeriod = 0;
+    uint32_t timeClock = 0;
     
-    //Get the clock count of timer ticks.
-    clockCnt = bsp_getClockCount();
-    zmos_clock = zmos_getTimerClock();
-    
-    if(zmos_clock != clockCnt)
+    if(!time_ms) timePeriod = 1;
+    else
     {
-        zmos_timeTickUpdate(clockCnt - zmos_clock);
+        timeClock = UCS_getSMCLK()/8;
+        timePeriod = time_ms * timeClock/1000;
     }
+    Timer_A_stop(TIMER_A0_BASE);
+    //Start timer in upMode sourced by ACLK
+	Timer_A_clearTimerInterrupt(TIMER_A0_BASE);
+
+    Timer_A_initUpModeParam initUpParam = {0};
+    initUpParam.clockSource = TIMER_A_CLOCKSOURCE_SMCLK;
+    initUpParam.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_8;
+    initUpParam.timerPeriod = timePeriod;
+    initUpParam.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_ENABLE;
+    initUpParam.captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
+    initUpParam.timerClear = TIMER_A_DO_CLEAR;
+    initUpParam.startTimer = true;
+    Timer_A_initUpMode(TIMER_A0_BASE, &initUpParam);
 }
 /*****************************************************************
-* FUNCTION: zmos_sysEnterCritical
+* FUNCTION: bsp_clockInit
 *
 * DESCRIPTION:
-*     System enter critical.
+*     Bsp clock initialize.
 * INPUTS:
 *     null
 * RETURNS:
-*     null
+*     Clock count.
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysEnterCritical(void)
+void bsp_clockInit(void)
 {
-    bsp_mcuDisableInterrupt();
-    
-    zmosCriticalNesting++;
+    clockTicks = 0;
+    setTimerTimeout(1);
 }
 /*****************************************************************
-* FUNCTION: zmos_sysExitCritical
+* FUNCTION: bsp_getClockCount
 *
 * DESCRIPTION:
-*     System exit critical.
+*     Get clock count, it provide system clock for ZMOS.
 * INPUTS:
 *     null
 * RETURNS:
-*     null
+*     Clock count.
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_sysExitCritical(void)
+uint32_t bsp_getClockCount(void)
 {
-    if(zmosCriticalNesting && --zmosCriticalNesting == 0)
-    {
-        bsp_mcuEnableInterrupt();
-    }
-}
-/*****************************************************************
-* FUNCTION: zmos_system_init
-*
-* DESCRIPTION:
-*     ZMOS system initialize.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_system_init(void)
-{
-    // Initialize bsp
-    bsp_init();
-    // Initialize zmos timer
-    zmos_timerInit();
-    
-#if ZMOS_USE_CBTIMERS_NUM > 0
-    // Initialize the callback timer
-    zmos_cbTimerInit();
-#endif
-    
-#if ZMOS_USE_LOW_POWER
-    // Initialize the power management system
-    zmos_lowPwrMgrInit();
-#endif
-    //Initialize critical nesting
-    zmosCriticalNesting = 0;
+    return clockTicks;
 }
 
-/*****************************************************************
-* FUNCTION: zmos_system_start
-*
-* DESCRIPTION:
-*     ZMOS system run start.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     This function is the main loop function of the task system. 
-*     This Function doesn't return.
-*****************************************************************/
-void zmos_system_start(void)
+
+//******************************************************************************
+//
+//This is the Timer0_A5 interrupt vector service routine.
+//
+//******************************************************************************
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt
+#elif defined(__GNUC__)
+__attribute__((interrupt(TIMER0_A1_VECTOR)))
+#endif
+void TIMER0_A1_ISR (void)
 {
-    while(1)
-    {
-        /* Loop run zmos system */
-        zmos_system_run();
+    switch (__even_in_range(TA0IV,14)){
+        case  0: break;                          //No interrupt
+        case  2: break;                          //CCR1 not used
+        case  4: break;                          //CCR2 not used
+        case  6: break;                          //reserved
+        case  8: break;                          //reserved
+        case 10: break;                          //reserved
+        case 12: break;                          //reserved
+        case 14:                                 //overflow
+            clockTicks++;
+            break;
+        default: break;
     }
 }
-
-/*****************************************************************
-* FUNCTION: zmos_system_run
-*
-* DESCRIPTION:
-*     This function is used to schedule once task.
-* INPUTS:
-*     null
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-void zmos_system_run(void)
-{
-    zmos_systemClockUpdate();
-    //ZMOS start a task schedule
-    zmos_taskStartScheduler();
-    
-#if ZMOS_USE_LOW_POWER
-    // Put the processor/system into sleep
-    zmos_lowPowerManagement();
-#endif
-}
-
 /****************************************************** END OF FILE ******************************************************/
