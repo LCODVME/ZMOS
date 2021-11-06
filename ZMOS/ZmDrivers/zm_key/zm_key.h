@@ -77,9 +77,9 @@ extern "C"
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
 
-#if (ZM_KEY_MAX_NUM <= 8)
+#if (ZM_KEY_MAX_NUM < 8)
 typedef uint8_t zmKeyType_t;
-#elif (ZM_KEY_MAX_NUM <= 16)
+#elif (ZM_KEY_MAX_NUM < 16)
 typedef uint16_t zmKeyType_t;
 #else
 typedef uint32_t zmKeyType_t;
