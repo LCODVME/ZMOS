@@ -74,7 +74,7 @@ extern "C"
 #error "The keys num no more than 32."
 #endif
 /* Long press enable */
-#define ZM_KEY_LONG_PRESS
+#define ZM_KEY_USE_LONG_PRESS
 /* Key press debounce */
 #define ZM_KEY_PRESS_DEBOUNCE   20
      
