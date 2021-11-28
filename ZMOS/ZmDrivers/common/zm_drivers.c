@@ -69,6 +69,12 @@ extern void zm_ledInit(void);
 extern void zm_updateLedBlink(void);
 #endif /* ZM_LED_BLINK */
 #endif /* ZM_LED_MAX_NUM > 0 */
+
+/* ZM key */
+#if ZM_KEY_MAX_NUM > 0
+extern void zm_keyInit(void);
+extern void zm_keyPollProcess(void);
+#endif /* ZM_KEY_MAX_NUM > 0 */
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -91,6 +97,10 @@ void zmDriverInit(void)
     /* ZM led */
 #if ZM_LED_MAX_NUM > 0
     zm_ledInit();
+#endif
+    /* ZM key */
+#if ZM_KEY_MAX_NUM > 0
+    zm_keyInit();
 #endif
 }
 /*****************************************************************
