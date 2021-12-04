@@ -67,8 +67,36 @@ extern "C"
 #define ZM_KEY_30  BS(29)
 #define ZM_KEY_31  BS(30)
 #define ZM_KEY_32  BS(31)
-#endif //(ZM_KEY_MAX_NUM > 8)
+#endif // (ZM_KEY_MAX_NUM > 8)
 #endif // (ZM_KEY_MAX_NUM > 16)
+    
+/* ZM respond press events */
+#define ZM_KEY_EVENT_SHORT_PRESS_EACH       BS(0)
+#ifdef ZM_KEY_USE_LONG_PRESS
+#define ZM_KEY_EVENT_PRESS_LONG             BS(1)
+#define ZM_KEY_EVENT_PRESS_LONG_HOLD        BS(2)
+#define ZM_KEY_EVENT_PRESS_LONG_RELEASE     BS(3)
+#endif // ZM_KEY_USE_LONG_PRESS
+#define ZM_KEY_EVENT_PRESS_UP               BS(8)
+#define ZM_KEY_EVENT_PRESS_DOWN             BS(9)
+#define ZM_KEY_EVENT_PRESS_1                BS(10)
+#define ZM_KEY_EVENT_PRESS_2                BS(11)
+#define ZM_KEY_EVENT_PRESS_3                BS(12)
+#define ZM_KEY_EVENT_PRESS_4                BS(13)
+#define ZM_KEY_EVENT_PRESS_5                BS(14)
+#define ZM_KEY_EVENT_PRESS_6                BS(15)
+#define ZM_KEY_EVENT_PRESS_7                BS(16)
+#define ZM_KEY_EVENT_PRESS_8                BS(17)
+#define ZM_KEY_EVENT_PRESS_9                BS(18)
+#define ZM_KEY_EVENT_PRESS_10               BS(19)
+
+
+    
+#define ZM_DEFAULT_POLL_TIME            (10)  //ms
+#define ZM_DEFAULT_DEBOUNCE_TICKS       (2)  //max : 63
+#define ZM_DEFAULT_PRESS_SHORT_TICKS    (300 / ZM_DEFAULT_POLL_TIME)
+#define ZM_DEFAULT_PRESS_LONG_TICKS     (3000 / ZM_DEFAULT_POLL_TIME)
+#define ZM_DEFAULT_PRESS_HOLD_TICKS     (ZM_DEFAULT_POLL_TIME / ZM_DEFAULT_POLL_TIME)
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -85,38 +113,53 @@ typedef uint16_t zmKeyType_t;
 typedef uint32_t zmKeyType_t;
 #endif
      
-/*typedef enum
-{
-    
-}zm_*/ 
-
+//typedef uint16_t zmKeEvent_t;
 typedef enum
 {
-    E_KEY_NONE = 0,
-    E_KEY_PRESS,
-#ifdef ZM_KEY_LONG_PRESS
-    E_KEY_LONG_PRESS,
-    E_KEY_RELEASED
+    ZM_KEY_NONE_PRESS = 0,
+    ZM_KEY_PRESS_DOWN,
+    ZM_KEY_PRESS_UP,
+    ZM_KEY_SHORT_PRESS,
+#ifdef ZM_KEY_USE_LONG_PRESS
+    ZM_KEY_LONG_PRESS,
+    ZM_KEY_LONG_PRESS_HOLD,
+    ZM_KEY_LONG_PRESS_RELEASE,
 #endif
-}zm_keyAction_t;
+}zmKeEvent_t;
 
-typedef struct
+typedef struct zmKeyEventState
 {
     union
     {
-        uint8_t num;
-        uint32_t time;
-    }u;
-    zm_keyAction_t keyAction;
-}zmKeyEvent_t;
+        uint8_t pressNum;
+#ifdef ZM_KEY_USE_LONG_PRESS
+        uint32_t pressLongTime;
+#endif
+    }status;
+    zmKeEvent_t keyEvent;
+}zmKeyEventState_t;
 
-typedef void (* zmKeyEventCb)(zmKeyType_t key, zmKeyEvent_t keyEvent);
+typedef void (* zmKeyEventCb)(zmKeyType_t key, zmKeyEventState_t keyEventState);
      
-
+typedef uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
- 
+
+/*****************************************************************
+* FUNCTION: zm_keyPollStart
+*
+* DESCRIPTION:
+*     This function to start key poll.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_keyPollStart(void);
+
 #ifdef __cplusplus
 }
 #endif
