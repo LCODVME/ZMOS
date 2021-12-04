@@ -38,7 +38,8 @@
 #define ZM_GET_MAX(a, b)            ((a) > (b) ? (a) : (b))
 #define ZM_GET_MIN(a, b)            ((a) < (b) ? (a) : (b))
 
-#define ZM_VS(val, n) ((val) << (n))
+#define ZM_VLS(val, n) ((val) << (n))
+#define ZM_VRS(val, n) ((val) >> (n))
 
 #define ZM_KEY_DEBOUNCE_TIME(stu)       (stu->debounceTick)
 #define ZM_KEY_SHORT_PRESS_TIME(stu)    (stu->shortPressTick)
@@ -286,7 +287,7 @@ void zm_keyPollProcess(void)
                 {
                     ZM_U8_MAX_HOLD(stu->eventStatus.status.pressNum);
                     if(stu->respEvent & ZM_KEY_EVENT_SHORT_PRESS_EACH || 
-                       stu->respEvent & ZM_VS(ZM_KEY_EVENT_PRESS_DOWN, stu->eventStatus.status.pressNum))
+                       stu->respEvent & ZM_VLS(ZM_KEY_EVENT_PRESS_DOWN, stu->eventStatus.status.pressNum))
                     {
                         ZM_KEY_CALLBACK(key, stu);
                         stu->eventStatus.keyEvent = ZM_KEY_NONE_PRESS;
