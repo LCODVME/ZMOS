@@ -71,16 +71,16 @@ extern "C"
 #endif // (ZM_KEY_MAX_NUM > 16)
     
 /* ZM respond press events */
-#define ZM_KEY_EVENT_SHORT_PRESS_EACH       BS(0)
-#ifdef ZM_KEY_USE_LONG_PRESS
-#define ZM_KEY_EVENT_PRESS_LONG             BS(1)
-#define ZM_KEY_EVENT_PRESS_LONG_HOLD        BS(2)
-#define ZM_KEY_EVENT_PRESS_LONG_RELEASE     BS(3)
+#define ZM_KEY_EVENT_SHORT_PRESS_EACH       BS(0)  //Respond to each short press.
+#if ZM_KEY_USE_LONG_PRESS
+#define ZM_KEY_EVENT_PRESS_LONG             BS(1)  //Respond long press.
+#define ZM_KEY_EVENT_PRESS_LONG_HOLD        BS(2)  //Respond long press hold.
+#define ZM_KEY_EVENT_PRESS_LONG_RELEASE     BS(3)  //Respond long press to release.
 #endif // ZM_KEY_USE_LONG_PRESS
-#define ZM_KEY_EVENT_PRESS_UP               BS(8)
-#define ZM_KEY_EVENT_PRESS_DOWN             BS(9)
-#define ZM_KEY_EVENT_PRESS_1                BS(10)
-#define ZM_KEY_EVENT_PRESS_2                BS(11)
+#define ZM_KEY_EVENT_PRESS_UP               BS(8)  //Respond press down to up.
+#define ZM_KEY_EVENT_PRESS_DOWN             BS(9)  //Respond press down.
+#define ZM_KEY_EVENT_PRESS_1                BS(10) //Respond once short press.
+#define ZM_KEY_EVENT_PRESS_2                BS(11) //Respond twice short press.
 #define ZM_KEY_EVENT_PRESS_3                BS(12)
 #define ZM_KEY_EVENT_PRESS_4                BS(13)
 #define ZM_KEY_EVENT_PRESS_5                BS(14)
@@ -92,11 +92,11 @@ extern "C"
 
 
     
-#define ZM_DEFAULT_POLL_TIME            (10)  //ms
-#define ZM_DEFAULT_DEBOUNCE_TICKS       (2)  //max : 63
-#define ZM_DEFAULT_PRESS_SHORT_TICKS    (300 / ZM_DEFAULT_POLL_TIME)
-#define ZM_DEFAULT_PRESS_LONG_TICKS     (3000 / ZM_DEFAULT_POLL_TIME)
-#define ZM_DEFAULT_PRESS_HOLD_TICKS     (ZM_DEFAULT_POLL_TIME / ZM_DEFAULT_POLL_TIME)
+#define ZM_DEFAULT_POLL_TIME                (10)  //default poll time(1 ~ 65535 ms).
+#define ZM_DEFAULT_DEBOUNCE_TIME            (20)  //default debounce time(0 ~ 255 ms).
+#define ZM_DEFAULT_PRESS_SHORT_TIME         (300) //default short press interval time(1 ~ 65535 ms).
+#define ZM_DEFAULT_PRESS_LONG_TIME          (1000) //default long press time(1 ~ 0xFFFFFFFF ms).
+#define ZM_DEFAULT_PRESS_HOLD_TIME          (1000) //default long press hold respond interval(1 ~ 65535 ms).
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -104,7 +104,9 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-
+/**
+ * zm key type define.
+ */
 #if (ZM_KEY_MAX_NUM < 8)
 typedef uint8_t zmKeyType_t;
 #elif (ZM_KEY_MAX_NUM < 16)
@@ -112,40 +114,129 @@ typedef uint16_t zmKeyType_t;
 #else
 typedef uint32_t zmKeyType_t;
 #endif
-     
-//typedef uint16_t zmKeEvent_t;
+/**
+ * zm key event status.
+ */
 typedef enum
 {
     ZM_KEY_NONE_PRESS = 0,
     ZM_KEY_PRESS_DOWN,
     ZM_KEY_PRESS_UP,
     ZM_KEY_SHORT_PRESS,
-#ifdef ZM_KEY_USE_LONG_PRESS
+#if ZM_KEY_USE_LONG_PRESS
     ZM_KEY_LONG_PRESS,
     ZM_KEY_LONG_PRESS_HOLD,
     ZM_KEY_LONG_PRESS_RELEASE,
 #endif
-}zmKeEvent_t;
+}zmKeyEvent_t;
 
+/** 
+ * zm custom config item.
+ */
+typedef enum
+{
+    ZM_KEY_CONF_SET_ACTIVE_LEVEL,
+    ZM_KEY_CONF_SET_RESP_EVENT,
+    ZM_KEY_CONF_ADD_RESP_EVENT,
+    ZM_KEY_CONF_DEL_RESP_EVENT,
+    ZM_KEY_CONF_RESP_CALLBACK,
+#if ZM_KEY_ENABLE_CUSTOM
+    ZM_KEY_CONF_POLL_TIME,
+    ZM_KEY_CONF_DEBOUNCE_TIME,
+    ZM_KEY_CONF_SHORT_TIME,
+#if ZM_KEY_USE_LONG_PRESS
+    ZM_KEY_CONF_LONG_TIME,
+    ZM_KEY_CONF_HOLD_TIME,
+#endif //ZM_KEY_USE_LONG_PRESS
+#endif //ZM_KEY_ENABLE_CUSTOM
+    ZM_KEY_CONF_READ_LEVEL_FUNC,
+}zmKeyConfItem_t;
+
+/**
+ * zm key status struct. 
+ */
 typedef struct zmKeyEventState
 {
     union
     {
         uint8_t pressNum;
-#ifdef ZM_KEY_USE_LONG_PRESS
+#if ZM_KEY_USE_LONG_PRESS
         uint32_t pressLongTime;
 #endif
     }status;
-    zmKeEvent_t keyEvent;
+    zmKeyEvent_t keyEvent;
+#if ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
+    uint32_t pressTime;
+#endif
 }zmKeyEventState_t;
-
+/**
+ * zm key event repond call back.
+ *
+ * @param key : The key that triggers the response.
+ * @param keyEventState : key status(@ref zmKeyEventState_t).
+ */
 typedef void (* zmKeyEventCb)(zmKeyType_t key, zmKeyEventState_t keyEventState);
-     
+/**
+ * Read key pin level function.
+ *
+ * @param key : which key to read.
+ *
+ * @return the key pin level.
+ *
+ * @note : config by zm_setKeyConfig, confItem ZM_KEY_CONF_READ_LEVEL_FUNC.
+ */
 typedef uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-
+/*****************************************************************
+* FUNCTION: zm_keyRegister
+*
+* DESCRIPTION:
+*     This function to register key.
+*     When key was pressed, callback will be call.
+* INPUTS:
+*     keys : Bit mask value of keys to register.
+*     keyActive : The level at which the key is pressed.
+*                 0 : active low.
+*                 1 : active high.
+*     respEvent : The event to respond to and callback.
+*                  Example : ZM_EVENT_PRESS_1 is Respond once by pressing.
+*                            ZM_EVENT_PRESS_1 | ZM_EVENT_PRESS_2 is respond to
+*                            one and two press downs.
+*     keyCallback : Key callback function.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, uint32_t respEvent, zmKeyEventCb keyCallback);
+/*****************************************************************
+* FUNCTION: zm_keyUnregister
+*
+* DESCRIPTION:
+*     This function to unregister keys.
+* INPUTS:
+*     keys : Bit mask value of keys to unregister.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_keyUnregister(zmKeyType_t keys);
+/*****************************************************************
+* FUNCTION: zm_getKeyStatus
+*
+* DESCRIPTION:
+*     This function to get key status.
+* INPUTS:
+*     key : The state of the key you want to get.
+* RETURNS:
+*     key status.
+* NOTE:
+*     All returns 0 if key does not exist.
+*****************************************************************/
+zmKeyEventState_t zm_getKeyStatus(zmKeyType_t key);
 /*****************************************************************
 * FUNCTION: zm_keyPollStart
 *
@@ -159,6 +250,36 @@ typedef uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
 *     null
 *****************************************************************/
 void zm_keyPollStart(void);
+/*****************************************************************
+* FUNCTION: zm_keyPollStop
+*
+* DESCRIPTION:
+*     This function to stop key poll.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_keyPollStop(void);
+/*****************************************************************
+* FUNCTION: zm_setKeyConfig
+*
+* DESCRIPTION:
+*     This function to config key parameters.
+* INPUTS:
+*     keys : Bit mask value of keys to config.
+*     confItem : Item to configure.
+*     val :  value.
+* RETURNS:
+*     null
+* NOTE:
+*     If the confItem is ZM_KEY_CONF_POLL_TIME, 
+*     the keys can be arbitrary.
+*****************************************************************/
+void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, void *val);
+
 
 #ifdef __cplusplus
 }
