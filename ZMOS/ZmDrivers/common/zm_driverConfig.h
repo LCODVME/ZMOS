@@ -73,10 +73,30 @@ extern "C"
 #if ZM_KEY_MAX_NUM > 32
 #error "The keys num no more than 32."
 #endif
-/* Long press enable */
-#define ZM_KEY_USE_LONG_PRESS
-/* Key press debounce */
-#define ZM_KEY_PRESS_DEBOUNCE   20
+/**
+ * Long press enable.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_USE_LONG_PRESS
+#define ZM_KEY_USE_LONG_PRESS   1
+#endif
+/**
+ * Enable or disable custom key configuration.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_ENABLE_CUSTOM
+#define ZM_KEY_ENABLE_CUSTOM    1
+#endif
+/**
+ * Press down time record.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
+#define ZM_KEY_USE_PRESS_DOWN_TIME_RECORD   1
+#endif
      
 #endif
 /**********************End of zm key dirver config*****************/
