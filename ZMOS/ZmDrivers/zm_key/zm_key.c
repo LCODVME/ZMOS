@@ -474,13 +474,13 @@ void zm_keyPollProcess(void)
                     {
                         ZM_KEY_CALLBACK(key, stu);
                     }
+#if ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
+                    stu->eventStatus.pressTime = 0;
+#endif
                     wait = ZMOS_GET_MIN(wait, stu->next);
                 }
                 break;
             case ZM_KEY_PRESS_UP:
-#if ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
-                    stu->eventStatus.pressTime = 0;
-#endif
                 if(time >= stu->next || stu->keyLevel == stu->activeLevel)
                 {
                     ZMOS_U8_MAX_HOLD(stu->eventStatus.status.pressNum);
