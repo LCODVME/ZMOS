@@ -58,16 +58,23 @@ typedef struct zmos_task*  zmos_taskHandle_t;
     
 /**
  * Event handler function prototype.
+ *
+ * @param event : task event.
  */
 typedef uTaskEvent_t (*taskFunction_t)(uTaskEvent_t event);
 /**
- * ZMOS tsdk struct.
+ * ZMOS task struct.
  */
 typedef struct zmos_task
 {
     uTaskEvent_t event;
     taskFunction_t taskFunc;
 }zmos_task_t;
+
+/**
+ * ZMOS idle task function.
+ */
+typedef void (* idleTaskFunc)(void);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -117,6 +124,19 @@ taskReslt_t zmos_setTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events
 *     null
 *****************************************************************/
 taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t events);
+/*****************************************************************
+* FUNCTION: zmos_setIdleTaskFunction
+*
+* DESCRIPTION:
+*     This function to set the idle task function.
+* INPUTS:
+*     func : idle task function.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_setIdleTaskFunction(idleTaskFunc func);
 /*****************************************************************
 * FUNCTION: zmos_getCurrentTaskHandle
 *
