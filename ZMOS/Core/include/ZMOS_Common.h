@@ -36,7 +36,7 @@ extern "C"
  * ZMOS null define.
  */
 #ifndef NULL
-  #define NULL   _NULL
+#define NULL   0
 #endif
     
 /**
