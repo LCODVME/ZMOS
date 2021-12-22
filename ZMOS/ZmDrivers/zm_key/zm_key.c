@@ -294,12 +294,12 @@ void zm_keyPollStop(void)
 *     If the confItem is ZM_KEY_CONF_POLL_TIME, 
 *     the keys can be arbitrary.
 *****************************************************************/
-void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, void *val)
+void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val)
 {
 #if ZM_KEY_ENABLE_CUSTOM
     if(confItem == ZM_KEY_CONF_POLL_TIME)
     {
-        zmKeyPollPeriod = *(uint16_t *)val;
+        zmKeyPollPeriod = (uint16_t )val;
         return;
     }
 #endif
@@ -317,39 +317,33 @@ void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, void *val)
             switch(confItem)
             {
             case ZM_KEY_CONF_SET_RESP_EVENT:
-                stu->respEvent = *(uint32_t *)val;
+                stu->respEvent = (uint32_t )val;
                 break;
             case ZM_KEY_CONF_SET_ACTIVE_LEVEL:
-                stu->activeLevel = *(uint8_t *)val;
+                stu->activeLevel = (uint8_t )val;
                 break;
             case ZM_KEY_CONF_ADD_RESP_EVENT:
-                stu->respEvent |= *(uint32_t *)val;
+                stu->respEvent |= (uint32_t )val;
                 break;
             case ZM_KEY_CONF_DEL_RESP_EVENT:
-                stu->respEvent &= ~*(uint32_t *)val;
-                break;
-            case ZM_KEY_CONF_RESP_CALLBACK:
-                stu->funcCb = (zmKeyEventCb)val;
+                stu->respEvent &= ~(uint32_t )val;
                 break;
 #if ZM_KEY_ENABLE_CUSTOM
             case ZM_KEY_CONF_DEBOUNCE_TIME:
-                stu->debnceTime = *(uint8_t *)val;
+                stu->debnceTime = (uint8_t )val;
                 break;
             case ZM_KEY_CONF_SHORT_TIME:
-                stu->shortIntvlTm = *(uint16_t *)val;
+                stu->shortIntvlTm = (uint16_t )val;
                 break;
 #if ZM_KEY_USE_LONG_PRESS
             case ZM_KEY_CONF_LONG_TIME:
-                stu->longPressTime = *(uint32_t *)val;
+                stu->longPressTime = (uint32_t )val;
                 break;
             case ZM_KEY_CONF_HOLD_TIME:
-                stu->holdCbInterval = *(uint16_t *)val;
+                stu->holdCbInterval = (uint16_t )val;
                 break;
 #endif //ZM_KEY_USE_LONG_PRESS
 #endif //ZM_KEY_ENABLE_CUSTOM
-            case ZM_KEY_CONF_READ_LEVEL_FUNC:
-                stu->readKeyLevel = (readKeyLevelFunc)val;
-                break;
             default : return;
             }
             keys ^= key;
@@ -359,6 +353,39 @@ void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, void *val)
     }
 }
 
+/*****************************************************************
+* FUNCTION: zm_setReadKeyLevelFunc
+*
+* DESCRIPTION:
+*     This function to set the read key pin level function.
+* INPUTS:
+*     keys : Bit mask value of keys to config.
+*     func :  The function to set.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_setReadKeyLevelFunc(zmKeyType_t keys, readKeyLevelFunc func)
+{
+    if(keys >= BS(ZM_KEY_MAX_NUM)) return;
+    zmKeyType_t key;
+    zmKeyStatus_t *stu;
+    
+    key = ZM_KEY_1;
+    stu = keyStatusTable;
+    
+    while(keys)
+    {
+        if(keys & key)
+        {
+            stu->readKeyLevel = func;
+            keys ^= key;
+        }
+        key <<= 1;
+        stu++;
+    }
+}
 /*****************************************************************
 * FUNCTION: zm_keyPollProcess
 *
