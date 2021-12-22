@@ -546,12 +546,7 @@ void zm_keyPollProcess(void)
                 if(time >= stu->next || stu->keyLevel == stu->activeLevel)
                 {
                     ZMOS_U8_MAX_HOLD(stu->eventStatus.status.pressNum);
-                    if(stu->respEvent & ZM_KEY_EVENT_SHORT_PRESS_EACH || 
-                       stu->respEvent & ZMOS_VLS(ZM_KEY_EVENT_PRESS_DOWN, stu->eventStatus.status.pressNum))
-                    {
-                        stu->eventStatus.keyEvent = ZM_KEY_SHORT_PRESS;
-                        ZM_KEY_CALLBACK(key, stu);
-                    }
+                    
                     if(stu->keyLevel == stu->activeLevel)
                     {
                         stu->eventStatus.keyEvent = ZM_KEY_PRESS_DOWN;
@@ -562,6 +557,12 @@ void zm_keyPollProcess(void)
                     }
                     else
                     {
+                        if(stu->respEvent & ZM_KEY_EVENT_SHORT_PRESS_EACH || 
+                           stu->respEvent & ZMOS_VLS(ZM_KEY_EVENT_PRESS_DOWN, stu->eventStatus.status.pressNum))
+                        {
+                            stu->eventStatus.keyEvent = ZM_KEY_SHORT_PRESS;
+                            ZM_KEY_CALLBACK(key, stu);
+                        }
                         stu->eventStatus.keyEvent = ZM_KEY_NONE_PRESS;
                         stu->eventStatus.status.pressNum = 0;
                         stu->next = 0;
