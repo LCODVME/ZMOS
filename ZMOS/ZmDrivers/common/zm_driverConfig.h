@@ -39,7 +39,7 @@ extern "C"
  *       The larger the value, the more space it takes up.
  */
 #ifndef ZM_LED_MAX_NUM
-#define ZM_LED_MAX_NUM          2
+#define ZM_LED_MAX_NUM          1
 #endif
     
 #if ZM_LED_MAX_NUM > 0
@@ -65,7 +65,7 @@ extern "C"
  *       The larger the value, the more space it takes up.
  */
 #ifndef ZM_KEY_MAX_NUM
-#define ZM_KEY_MAX_NUM          4
+#define ZM_KEY_MAX_NUM          1
 #endif
     
 #if ZM_KEY_MAX_NUM > 0
