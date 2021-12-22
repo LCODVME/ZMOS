@@ -177,7 +177,7 @@ void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, uint32_t respEvent, zmK
             keyReg |= key;
             keys ^= key;
             
-            zm_keyPollStart();
+            zmDriverSetEvent(ZM_DRIVER_KEY_POLL_EVENT);
         }
         key <<= 1;
         stu++;
@@ -222,6 +222,41 @@ zmKeyEventState_t zm_getKeyStatus(zmKeyType_t key)
         }
     }
     return keyStatus;
+}
+/*****************************************************************
+* FUNCTION: zm_resetKeyStatus
+*
+* DESCRIPTION:
+*     This function to reset the key status.
+* INPUTS:
+*     keys : Bit mask value of keys to reset.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_resetKeyStatus(zmKeyType_t keys)
+{
+    if(keys >= BS(ZM_KEY_MAX_NUM)) return;
+    zmKeyType_t key;
+    zmKeyStatus_t *stu;
+    
+    key = ZM_KEY_1;
+    stu = keyStatusTable;
+    
+    while(keys)
+    {
+        if(keys & key)
+        {
+            stu->keyLevel = ~stu->activeLevel;
+            stu->debnceSte = 0;
+            stu->timeRecord = zmos_getTimerClock();
+            memset(&stu->eventStatus, 0, sizeof(zmKeyEventState_t));
+            keys ^= key;
+        }
+        key <<= 1;
+        stu++;
+    }
 }
 /*****************************************************************
 * FUNCTION: zm_keyPollStart
@@ -359,7 +394,7 @@ void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val)
 * DESCRIPTION:
 *     This function to set the read key pin level function.
 * INPUTS:
-*     keys : Bit mask value of keys to config.
+*     keys : Bit mask value of keys to set.
 *     func :  The function to set.
 * RETURNS:
 *     null
