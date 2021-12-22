@@ -95,7 +95,7 @@ extern "C"
 #define ZM_DEFAULT_POLL_TIME                (10)  //default poll time(1 ~ 65535 ms).
 #define ZM_DEFAULT_DEBOUNCE_TIME            (20)  //default debounce time(0 ~ 255 ms).
 #define ZM_DEFAULT_PRESS_SHORT_TIME         (300) //default short press interval time(1 ~ 65535 ms).
-#define ZM_DEFAULT_PRESS_LONG_TIME          (1000) //default long press time(1 ~ 0xFFFFFFFF ms).
+#define ZM_DEFAULT_PRESS_LONG_TIME          (2000) //default long press time(1 ~ 0xFFFFFFFF ms).
 #define ZM_DEFAULT_PRESS_HOLD_TIME          (1000) //default long press hold respond interval(1 ~ 65535 ms).
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
@@ -139,7 +139,6 @@ typedef enum
     ZM_KEY_CONF_SET_RESP_EVENT,
     ZM_KEY_CONF_ADD_RESP_EVENT,
     ZM_KEY_CONF_DEL_RESP_EVENT,
-    ZM_KEY_CONF_RESP_CALLBACK,
 #if ZM_KEY_ENABLE_CUSTOM
     ZM_KEY_CONF_POLL_TIME,
     ZM_KEY_CONF_DEBOUNCE_TIME,
@@ -149,7 +148,6 @@ typedef enum
     ZM_KEY_CONF_HOLD_TIME,
 #endif //ZM_KEY_USE_LONG_PRESS
 #endif //ZM_KEY_ENABLE_CUSTOM
-    ZM_KEY_CONF_READ_LEVEL_FUNC,
 }zmKeyConfItem_t;
 
 /**
@@ -238,6 +236,19 @@ void zm_keyUnregister(zmKeyType_t keys);
 *****************************************************************/
 zmKeyEventState_t zm_getKeyStatus(zmKeyType_t key);
 /*****************************************************************
+* FUNCTION: zm_resetKeyStatus
+*
+* DESCRIPTION:
+*     This function to reset the key status.
+* INPUTS:
+*     keys : Bit mask value of keys to reset.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_resetKeyStatus(zmKeyType_t keys);
+/*****************************************************************
 * FUNCTION: zm_keyPollStart
 *
 * DESCRIPTION:
@@ -278,8 +289,21 @@ void zm_keyPollStop(void);
 *     If the confItem is ZM_KEY_CONF_POLL_TIME, 
 *     the keys can be arbitrary.
 *****************************************************************/
-void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, void *val);
-
+void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val);
+/*****************************************************************
+* FUNCTION: zm_setReadKeyLevelFunc
+*
+* DESCRIPTION:
+*     This function to set the read key pin level function.
+* INPUTS:
+*     keys : Bit mask value of keys to config.
+*     func :  The function to set.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zm_setReadKeyLevelFunc(zmKeyType_t keys, readKeyLevelFunc func);
 
 #ifdef __cplusplus
 }
