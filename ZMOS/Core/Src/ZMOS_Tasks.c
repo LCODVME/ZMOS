@@ -51,6 +51,8 @@ typedef struct zmosTaskList_T
 static zmosTaskList_t *taskListHead = NULL;
 /* Index of active task */
 static zmos_taskHandle_t activeTask = NULL;
+/* Idle task function */
+static idleTaskFunc zmosIdleTaskFunc = NULL;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -233,6 +235,22 @@ taskReslt_t zmos_clearTaskEvent(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
     return ZMOS_TASK_ERROR_PARAM;
 }
 /*****************************************************************
+* FUNCTION: zmos_setIdleTaskFunction
+*
+* DESCRIPTION:
+*     This function to set the idle task function.
+* INPUTS:
+*     func : idle task function.
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
+void zmos_setIdleTaskFunction(idleTaskFunc func)
+{
+    zmosIdleTaskFunc  = func;
+}
+/*****************************************************************
 * FUNCTION: zmos_getCurrentTaskHandle
 *
 * DESCRIPTION:
@@ -283,6 +301,10 @@ void zmos_taskStartScheduler(void)
         ZMOS_ENTER_CRITICAL();
         pNextTask->event |= events;
         ZMOS_EXIT_CRITICAL();
+    }
+    else
+    {
+        if(zmosIdleTaskFunc) zmosIdleTaskFunc();
     }
 }
 

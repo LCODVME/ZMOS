@@ -39,7 +39,7 @@ extern "C"
  *       The larger the value, the more space it takes up.
  */
 #ifndef ZM_LED_MAX_NUM
-#define ZM_LED_MAX_NUM          2
+#define ZM_LED_MAX_NUM          1
 #endif
     
 #if ZM_LED_MAX_NUM > 0
@@ -52,6 +52,54 @@ extern "C"
      
 #endif
 /**********************End of zm led dirver config*****************/
+     
+     
+/*******************************************************************
+ *  ZM key driver config.
+ */
+/**
+ * @brief ZM key drivers maximum support keys is the number.
+ *        0 : ZM key drivers are not used.
+ *
+ * @note No more than 32.
+ *       The larger the value, the more space it takes up.
+ */
+#ifndef ZM_KEY_MAX_NUM
+#define ZM_KEY_MAX_NUM          1
+#endif
+    
+#if ZM_KEY_MAX_NUM > 0
+     
+#if ZM_KEY_MAX_NUM > 32
+#error "The keys num no more than 32."
+#endif
+/**
+ * Long press enable.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_USE_LONG_PRESS
+#define ZM_KEY_USE_LONG_PRESS   1
+#endif
+/**
+ * Enable or disable custom key configuration.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_ENABLE_CUSTOM
+#define ZM_KEY_ENABLE_CUSTOM    1
+#endif
+/**
+ * Press down time record.
+ *      1 : enable
+ *      0 : disable
+ */
+#ifndef ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
+#define ZM_KEY_USE_PRESS_DOWN_TIME_RECORD   1
+#endif
+     
+#endif
+/**********************End of zm key dirver config*****************/
     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
