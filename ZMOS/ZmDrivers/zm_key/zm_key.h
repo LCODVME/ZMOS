@@ -115,7 +115,7 @@ typedef uint16_t zmKeyType_t;
 typedef uint32_t zmKeyType_t;
 #endif
 /**
- * zm key event status.
+ * zm key events enum.
  */
 typedef enum
 {
