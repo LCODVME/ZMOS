@@ -136,10 +136,10 @@ taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskF
     return ZMOS_TASK_FAILD;
 }
 /*****************************************************************
-* FUNCTION: zmos_taskThreadLogout
+* FUNCTION: zmos_taskThreadUnregister
 *
 * DESCRIPTION:
-*     ZMOS log out the task.
+*     ZMOS unregister the task.
 * INPUTS:
 *     pTaskHandle : The handle of the task to be deleted.
 * RETURNS:
@@ -147,7 +147,7 @@ taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskF
 * NOTE:
 *    Passing NULL will cause the calling task to be deleted.
 *****************************************************************/
-void zmos_taskThreadLogout(zmos_taskHandle_t pTaskHandle)
+void zmos_taskThreadUnregister(zmos_taskHandle_t pTaskHandle)
 {
     zmosTaskList_t *srchTask;
     zmosTaskList_t *prevTask;
