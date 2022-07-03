@@ -90,9 +90,9 @@ static uint8_t zm_i2cReadByte(zmI2cType_t i2c);
 * FUNCTION: zm_i2cInit
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c driver initialize.
 * INPUTS:
-*     delayFunc :
+*     delayFunc : Microsecond delay function.
 * RETURNS:
 *     Init status (@ref zmI2cRes_t).
 * NOTE:
@@ -113,11 +113,11 @@ zmI2cRes_t zm_i2cInit(zmI2cDelayUsFunc delayFunc)
 * FUNCTION: zm_i2cDeinit
 *
 * DESCRIPTION:
-*     i2c driver deinitialize.
+*     I2c driver deinit.
 * INPUTS:
-*     delayFunc :
+*     null
 * RETURNS:
-*     Init status (@ref zmI2cRes_t).
+*     null
 * NOTE:
 *     
 *****************************************************************/
@@ -130,11 +130,13 @@ void zm_i2cDeinit(void)
 * FUNCTION: zm_i2cSetConfig
 *
 * DESCRIPTION:
-*     i2c driver deinitialize.
+*     Set i2c module config.
 * INPUTS:
-*     delayFunc :
+*     i2c : Which i2c module to config.
+*     item : Item to configure (@ref zmI2cConfItem_t).
+*     conf : Configuration value.
 * RETURNS:
-*     Init status (@ref zmI2cRes_t).
+*     Execution status (@ref zmI2cRes_t).
 * NOTE:
 *     
 *****************************************************************/
@@ -171,11 +173,11 @@ zmI2cRes_t zm_i2cSetConfig(zmI2cType_t i2c, zmI2cConfItem_t item, void *conf)
 * FUNCTION: zm_i2cClearBus
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     Clear i2c bus.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c bus to clear.
 * RETURNS:
-*     Init status (@ref zmI2cRes_t).
+*     Execution status (@ref zmI2cRes_t).
 * NOTE:
 *     
 *****************************************************************/
@@ -201,11 +203,16 @@ zmI2cRes_t zm_i2cClearBus(zmI2cType_t i2c)
 * FUNCTION: zm_i2cSend
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c send data to slave.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module to send.
+*     slaveAddr : Slave address.
+*     regAddr : Register address.
+*     regAddrLen : Register address length.
+*     buf : Poing to data buffer.
+*     dataLen : Length to send.
 * RETURNS:
-*     Init status (@ref zmI2cRes_t).
+*     Execution status (@ref zmI2cRes_t).
 * NOTE:
 *     
 *****************************************************************/
@@ -255,20 +262,25 @@ zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
 * FUNCTION: zm_i2cReceive
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c receive data.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module to receive.
+*     slaveAddr : Slave address.
+*     regAddr : Register address.
+*     regAddrLen : Register address length.
+*     buf : Poing to data buffer.
+*     dataLen : Length to receive.
 * RETURNS:
-*     Init status (@ref zmI2cRes_t).
+*     Execution status (@ref zmI2cRes_t).
 * NOTE:
 *     
 *****************************************************************/
 zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
-                      uint8_t slaveAddr,
-                      uint8_t *regAddr,
-                      uint8_t regAddrLen,
-                      uint8_t *buf,
-                      uint16_t dataLen)
+                         uint8_t slaveAddr,
+                         uint8_t *regAddr,
+                         uint8_t regAddrLen,
+                         uint8_t *buf,
+                         uint16_t dataLen)
 {
     if(i2c > ZM_I2C_MAX_NUM) return ZM_I2C_PARAM_ERR;
     
@@ -314,9 +326,9 @@ zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
 * FUNCTION: zm_i2cStart
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c generate start signal.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
 *     null
 * NOTE:
@@ -345,9 +357,9 @@ static void zm_i2cStart(zmI2cType_t i2c)
 * FUNCTION: zm_i2cStop
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c generate stop signal.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
 *     null
 * NOTE:
@@ -378,9 +390,9 @@ static void zm_i2cStop(zmI2cType_t i2c)
 * FUNCTION: zm_i2cAck
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c generate ack signal.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
 *     null
 * NOTE:
@@ -407,9 +419,9 @@ static void zm_i2cAck(zmI2cType_t i2c)
 * FUNCTION: zm_i2cNotAck
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c not ack.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
 *     null
 * NOTE:
@@ -437,11 +449,11 @@ static void zm_i2cNotAck(zmI2cType_t i2c)
 * FUNCTION: zm_i2cGetAck
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c wait slave ack signal.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
-*     null
+*     Whether the slave ack, ZM_I2C_ACK or ZM_I2C_NOT_ACK.
 * NOTE:
 *     
 *****************************************************************/
@@ -475,9 +487,10 @@ static uint8_t zm_i2cGetAck(zmI2cType_t i2c)
 * FUNCTION: zm_i2cSendByte
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c send a byte data to slave.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
+*     data : data.
 * RETURNS:
 *     null
 * NOTE:
@@ -515,11 +528,11 @@ static void zm_i2cSendByte(zmI2cType_t i2c, uint8_t data)
 * FUNCTION: zm_i2cReadByte
 *
 * DESCRIPTION:
-*     i2c driver initialize.
+*     I2c receive a byte data.
 * INPUTS:
-*     i2c :
+*     i2c : Which i2c module.
 * RETURNS:
-*     null
+*     Received data.
 * NOTE:
 *     
 *****************************************************************/
