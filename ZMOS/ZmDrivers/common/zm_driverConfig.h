@@ -101,6 +101,32 @@ extern "C"
 #endif
 /**********************End of zm key dirver config*****************/
     
+     
+/*******************************************************************
+ *  ZM i2c driver config.
+ */
+/**
+ * @brief ZM i2c drivers maximum support i2c is the number.
+ *        0 : ZM i2c drivers are not used.
+ *
+ * @note No more than 32.
+ *       The larger the value, the more space it takes up.
+ */
+#ifndef ZM_I2C_MAX_NUM
+#define ZM_I2C_MAX_NUM          1
+#endif
+    
+#if ZM_I2C_MAX_NUM > 0
+     
+#if ZM_I2C_MAX_NUM > 32
+#error "The i2c num no more than 32."
+#endif
+     
+#endif
+/**********************End of zm i2c dirver config*****************/
+     
+     
+     
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
