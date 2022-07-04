@@ -57,7 +57,7 @@ typedef enum
 typedef enum
 {
     ZM_I2C_CONF_SET_DELAY_FN,
-    ZM_I2C_CONF_SET_SCL_PIN_SET_FN,
+    ZM_I2C_CONF_SET_SCL_PIN_VAL_FN,
     ZM_I2C_CONF_SET_SDA_PIN_DIR_FN,
     ZM_I2C_CONF_SET_SDA_PIN_VAL_FN,
     ZM_I2C_CONF_SET_SDA_PIN_READ_FN
@@ -95,19 +95,19 @@ typedef uint32_t zmI2cType_t;
 /**
  * zm i2c delay us function type.
  *
- * @param us : Microseconds of delay.
+ * @param[in] us : Microseconds of delay.
  */
 typedef void (* zmI2cDelayUsFunc)(uint8_t us);
 /**
  * zm i2c set pin value function type.
  *
- * @param val : Set pin value(@ref zmI2cPinVal_t).
+ * @param[in] val : Set pin value(@ref zmI2cPinVal_t).
  */
 typedef void (* zmI2cPinzValSetFunc)(zmI2cPinVal_t val);
 /**
  * zm i2c set pin direction function type.
  *
- * @param val : Set pin value(@ref zmI2cPinDir_t).
+ * @param[in] val : Set pin value(@ref zmI2cPinDir_t).
  */
 typedef void (* zmI2cPinDirSetFunc)(zmI2cPinDir_t dir);
 /**
