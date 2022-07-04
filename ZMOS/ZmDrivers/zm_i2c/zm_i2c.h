@@ -160,6 +160,20 @@ zmI2cRes_t zm_i2cInit(zmI2cDelayUsFunc delayFunc);
 *****************************************************************/
 void zm_i2cDeinit(void);
 /*****************************************************************
+* FUNCTION: zm_i2cApiSet
+*
+* DESCRIPTION:
+*     Set i2c api.
+* INPUTS:
+*     i2c : Which i2c module to set.
+*     api : The api struct (@ref zmI2cApi_t).
+* RETURNS:
+*     Execution status (@ref zmI2cRes_t).
+* NOTE:
+*     
+*****************************************************************/
+zmI2cRes_t zm_i2cApiSet(zmI2cType_t i2c, zmI2cApi_t api);
+/*****************************************************************
 * FUNCTION: zm_i2cSetConfig
 *
 * DESCRIPTION:

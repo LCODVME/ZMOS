@@ -125,7 +125,29 @@ void zm_i2cDeinit(void)
 {
     zmI2cDelayUs = NULL;
 }
-
+/*****************************************************************
+* FUNCTION: zm_i2cApiSet
+*
+* DESCRIPTION:
+*     Set i2c api.
+* INPUTS:
+*     i2c : Which i2c module to set.
+*     api : The api struct (@ref zmI2cApi_t).
+* RETURNS:
+*     Execution status (@ref zmI2cRes_t).
+* NOTE:
+*     
+*****************************************************************/
+zmI2cRes_t zm_i2cApiSet(zmI2cType_t i2c, zmI2cApi_t api)
+{
+    if(i2c >= ZM_I2C_MAX_NUM) return ZM_I2C_PARAM_ERR;
+    
+    ZM_I2C_CHECK_INIT();
+    
+    zmI2cStuTabel[i2c].i2cApi = api;
+    
+    return ZM_I2C_SUCCESS;
+}
 /*****************************************************************
 * FUNCTION: zm_i2cSetConfig
 *
