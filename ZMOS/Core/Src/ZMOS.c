@@ -30,7 +30,10 @@
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
- 
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+#define ZMOS_FUNC_INIT_SECTION_ITEM_GET(i) ZM_SECTION_ITEM_GET(ZMOS_INIT_SECTION_NAME, zmos_funcInit, (i))
+#define ZMOS_FUNC_INIT_SECTION_ITEM_COUNT  ZM_SECTION_ITEM_COUNT(ZMOS_INIT_SECTION_NAME, zmos_funcInit)
+#endif
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
@@ -42,6 +45,9 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+ZMOS_INIT_SECTION_DEF(ZMOS_INIT_SECTION_NAME, zmos_funcInit);
+#endif
 /* ZMOS nesting variable */
 static uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
@@ -151,6 +157,14 @@ void zmos_system_init(void)
 #if ZMOS_USE_CBTIMERS_NUM > 0
     // Initialize the callback timer
     zmos_cbTimerInit();
+#endif
+    
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+    zmos_funcInit *p_funcInit = ZM_SECTION_START_ADDR(ZMOS_INIT_SECTION_NAME);
+    for(uint16_t i = 0; i < ZMOS_FUNC_INIT_SECTION_ITEM_COUNT; i++)
+    {
+        if(p_funcInit[i]) p_funcInit[i]();
+    }
 #endif
     
 #if ZMOS_USE_LOW_POWER
