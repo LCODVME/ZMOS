@@ -197,4 +197,7 @@ timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events)
     return zmos_stopTimer(driverTaskHandle, events);
 }
 
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+ZNOS_INIT_REGISTER(zmDriverInit);
+#endif
 /****************************************************** END OF FILE ******************************************************/

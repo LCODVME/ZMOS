@@ -28,12 +28,23 @@ extern "C"
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
 /**
- * @brief types lib select.
+ * @brief ZMOS types lib select.
+ *        1 : enable
+ *        0 : disable
  */
 #ifndef ZMOS_TYPES_USE_CLIB
 #define ZMOS_TYPES_USE_CLIB         1
 #endif
     
+/**
+ * @brief ZMOS use init section.
+ *        1 : enable
+ *        0 : disable
+ */
+#ifndef ZMOS_INIT_SECTION
+#define ZMOS_INIT_SECTION           1
+#endif
+     
 /**
  * @brief ZMOS task maximum support event is the number.
  *        the value is 8¡¢16 or 32.
