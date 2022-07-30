@@ -149,6 +149,8 @@ void zmos_sysExitCritical(void)
 *****************************************************************/
 void zmos_system_init(void)
 {
+    //Initialize critical nesting
+    zmosCriticalNesting = 0;
     // Initialize bsp
     bsp_init();
     // Initialize zmos timer
@@ -160,6 +162,7 @@ void zmos_system_init(void)
 #endif
     
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+    //ZMOS section init function initialize
     zmos_funcInit *p_funcInit = ZM_SECTION_START_ADDR(ZMOS_INIT_SECTION_NAME);
     for(uint16_t i = 0; i < ZMOS_FUNC_INIT_SECTION_ITEM_COUNT; i++)
     {
@@ -171,8 +174,6 @@ void zmos_system_init(void)
     // Initialize the power management system
     zmos_lowPwrMgrInit();
 #endif
-    //Initialize critical nesting
-    zmosCriticalNesting = 0;
 }
 
 /*****************************************************************
