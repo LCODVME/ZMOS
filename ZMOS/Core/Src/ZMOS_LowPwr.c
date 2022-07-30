@@ -24,6 +24,7 @@
 #include "ZMOS.h"
 #include "ZMOS_Timers.h"
 #include "bsp_lpm.h"
+#include "ZMOS_Tasks.h"
 #include "ZMOS_LowPwr.h"
      
 #if ZMOS_USE_LOW_POWER
@@ -122,13 +123,19 @@ void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt)
 *****************************************************************/
 void zmos_lowPowerManagement(void)
 {
-    uint32_t nextTimeout;
     // When no event runs
-    if(zmos_lowPwrEvents == 0)
+    if(zmos_lowPwrEvents == 0
+#if ZMOS_LPM_WAIT_IDLE
+       && !zmos_checkTaskIsIdle()
+#endif
+           )
     {
+        uint32_t nextTimeout;
+
         ZMOS_ENTER_CRITICAL();
         // Get next timeout
         nextTimeout  = zmos_getNextLowestTimeout();
+        
         ZMOS_EXIT_CRITICAL();
         //Processing before entering low power
         bsp_lowPwrEnterBefore(nextTimeout);

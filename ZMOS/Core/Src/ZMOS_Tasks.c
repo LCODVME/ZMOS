@@ -307,7 +307,27 @@ void zmos_taskStartScheduler(void)
         if(zmosIdleTaskFunc) zmosIdleTaskFunc();
     }
 }
-
+/*****************************************************************
+* FUNCTION: zmos_checkTaskIsIdle
+*
+* DESCRIPTION:
+*     This function to check task is idle.
+* INPUTS:
+*     null
+* RETURNS:
+*     0:task idle
+*     1:task busy
+* NOTE:
+*     null
+*****************************************************************/
+uint8_t zmos_checkTaskIsIdle(void)
+{
+    if(zmos_getReadyTask())
+    {
+        return 1;
+    }
+    return 0;
+}
 /*****************************************************************
 * FUNCTION: zmos_getReadyTask
 *
