@@ -86,27 +86,35 @@ void zmos_lowPwrMgrInit(void)
 *     This function to set low power event.
 * INPUTS:
 *     event : Low power operation events bit(use 0 ~ 30).
-*     opt : Enable or disable enter low power mode(@ref zmos_lowPwrEvt_t).
 * RETURNS:
 *     null
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt)
+void zmos_lowPwrSetEvent(uint8_t event)
 {
     if(event < 32)
     {
-        switch(opt)
-        {
-        case LOWPWR_ENABLE:
-            zmos_lowPwrEvents &= BC(event);
-            break;
-        case LOWPWR_DISABLE:
-            zmos_lowPwrEvents |= BS(event);
-            break;
-        default :
-            break;
-        }
+        zmos_lowPwrEvents |= BS(event);
+    }
+}
+/*****************************************************************
+* FUNCTION: zmos_lowPwrClearEvent
+*
+* DESCRIPTION:
+*     This function to clear low power event.
+* INPUTS:
+*     event : Low power operation events bit(use 0 ~ 30).
+* RETURNS:
+*     null
+* NOTE:
+*     The bit 31 use by zmos system.
+*****************************************************************/
+void zmos_lowPwrClearEvent(uint8_t event)
+{
+    if(event < 32)
+    {
+        zmos_lowPwrEvents &= BC(event);
     }
 }
 /*****************************************************************
@@ -147,7 +155,8 @@ void zmos_lowPowerManagement(void)
 }
 #else
 void zmos_lowPwrMgrInit(void) {}
-void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt) {}
+void zmos_lowPwrSetEvent(uint8_t event) {}
+void zmos_lowPwrClearEvent(uint8_t event) {}
 void zmos_lowPowerManagement(void) {}
 #endif
 /****************************************************** END OF FILE ******************************************************/
