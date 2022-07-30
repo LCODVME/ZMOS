@@ -151,6 +151,20 @@ void zmos_setIdleTaskFunction(idleTaskFunc func);
 *     null
 *****************************************************************/
 zmos_taskHandle_t zmos_getCurrentTaskHandle(void);
+/*****************************************************************
+* FUNCTION: zmos_checkTaskIsIdle
+*
+* DESCRIPTION:
+*     This function to check task is idle.
+* INPUTS:
+*     null
+* RETURNS:
+*     0:task idle
+*     1:task busy
+* NOTE:
+*     null
+*****************************************************************/
+uint8_t zmos_checkTaskIsIdle(void);
 
 
 #ifdef __cplusplus
