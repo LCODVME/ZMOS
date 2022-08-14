@@ -24,6 +24,7 @@
 #include "ZMOS.h"
 #include "ZMOS_Timers.h"
 #include "bsp_lpm.h"
+#include "ZMOS_Tasks.h"
 #include "ZMOS_LowPwr.h"
      
 #if ZMOS_USE_LOW_POWER
@@ -85,27 +86,35 @@ void zmos_lowPwrMgrInit(void)
 *     This function to set low power event.
 * INPUTS:
 *     event : Low power operation events bit(use 0 ~ 30).
-*     opt : Enable or disable enter low power mode(@ref zmos_lowPwrEvt_t).
 * RETURNS:
 *     null
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt)
+void zmos_lowPwrSetEvent(uint8_t event)
 {
     if(event < 32)
     {
-        switch(opt)
-        {
-        case LOWPWR_ENABLE:
-            zmos_lowPwrEvents &= BC(event);
-            break;
-        case LOWPWR_DISABLE:
-            zmos_lowPwrEvents |= BS(event);
-            break;
-        default :
-            break;
-        }
+        zmos_lowPwrEvents |= BS(event);
+    }
+}
+/*****************************************************************
+* FUNCTION: zmos_lowPwrClearEvent
+*
+* DESCRIPTION:
+*     This function to clear low power event.
+* INPUTS:
+*     event : Low power operation events bit(use 0 ~ 30).
+* RETURNS:
+*     null
+* NOTE:
+*     The bit 31 use by zmos system.
+*****************************************************************/
+void zmos_lowPwrClearEvent(uint8_t event)
+{
+    if(event < 32)
+    {
+        zmos_lowPwrEvents &= BC(event);
     }
 }
 /*****************************************************************
@@ -122,13 +131,19 @@ void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt)
 *****************************************************************/
 void zmos_lowPowerManagement(void)
 {
-    uint32_t nextTimeout;
     // When no event runs
-    if(zmos_lowPwrEvents == 0)
+    if(zmos_lowPwrEvents == 0
+#if ZMOS_LPM_WAIT_IDLE
+       && !zmos_checkTaskIsIdle()
+#endif
+           )
     {
+        uint32_t nextTimeout;
+
         ZMOS_ENTER_CRITICAL();
         // Get next timeout
         nextTimeout  = zmos_getNextLowestTimeout();
+        
         ZMOS_EXIT_CRITICAL();
         //Processing before entering low power
         bsp_lowPwrEnterBefore(nextTimeout);
@@ -140,7 +155,8 @@ void zmos_lowPowerManagement(void)
 }
 #else
 void zmos_lowPwrMgrInit(void) {}
-void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt) {}
+void zmos_lowPwrSetEvent(uint8_t event) {}
+void zmos_lowPwrClearEvent(uint8_t event) {}
 void zmos_lowPowerManagement(void) {}
 #endif
 /****************************************************** END OF FILE ******************************************************/

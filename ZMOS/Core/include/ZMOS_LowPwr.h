@@ -39,11 +39,7 @@ extern "C"
 /*************************************************************************************************************************
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
-typedef enum
-{
-    LOWPWR_ENABLE,     ///< Allow access to low power.
-    LOWPWR_DISABLE     ///< Do not enter low power.
-}zmos_lowPwrEvt_t;
+
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -67,13 +63,25 @@ void zmos_lowPwrMgrInit(void);
 *     This function to set low power event.
 * INPUTS:
 *     event : Low power operation events bit(use 0 ~ 30).
-*     opt : Enable or disable enter low power mode(@ref zmos_lowPwrEvt_t).
 * RETURNS:
 *     null
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event, zmos_lowPwrEvt_t opt);
+void zmos_lowPwrSetEvent(uint8_t event);
+/*****************************************************************
+* FUNCTION: zmos_lowPwrClearEvent
+*
+* DESCRIPTION:
+*     This function to clear low power event.
+* INPUTS:
+*     event : Low power operation events bit(use 0 ~ 30).
+* RETURNS:
+*     null
+* NOTE:
+*     The bit 31 use by zmos system.
+*****************************************************************/
+void zmos_lowPwrClearEvent(uint8_t event);
 
 #ifdef __cplusplus
 }

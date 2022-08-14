@@ -33,6 +33,40 @@ extern "C"
  *************************************************************************************************************************/
 
 /**
+ * @brief Check if selected module is enabled
+ *
+ * This is save function for driver enable checking.
+ * Correct from Lint point of view (not using default of undefined value).
+ *
+ * Usage:
+ * @code
+   #if CLI_MODULE_ENABLED(UART)
+   ...
+   #endif
+ * @endcode
+ *
+ * @param module The module name.
+ *
+ * @retval 1 The macro <module>_ENABLE is defined and is non-zero.
+ * @retval 0 The macro <module>_ENABLE is not defined or it equals zero.
+ *
+ * @note
+ * This macro intentionally does not implement second expansion level.
+ * The name of the module to be checked has to be given directly as a parameter.
+ * And given parameter would be connected with @c _ENABLED postfix directly
+ * without evaluating its value.
+ */
+#ifdef ZM_MODULE_ENABLE_ALL
+#warning "Do not use ZM_MODULE_ENABLE_ALL for real builds."
+#define ZM_MODULE_ENABLED(module) 1
+#else
+#define ZM_MODULE_ENABLED(module) \
+    ((defined(module ## _ENABLED) && (module ## _ENABLED)) ? 1 : 0)
+#endif
+        
+        
+        
+/**
  * ZMOS null define.
  */
 #ifndef NULL

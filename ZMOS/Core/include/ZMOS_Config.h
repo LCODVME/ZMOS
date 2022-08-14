@@ -76,7 +76,15 @@ extern "C"
 #ifndef ZMOS_USE_LOW_POWER
 #define ZMOS_USE_LOW_POWER          0
 #endif
-    
+/**
+ * @brief ZMOS low power management whether to wait for the task to become idle.
+ *        1 : enable
+ *        0 : disable
+ *
+ */
+#ifndef ZMOS_LPM_WAIT_IDLE
+#define ZMOS_LPM_WAIT_IDLE          1
+#endif
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
  *************************************************************************************************************************/
