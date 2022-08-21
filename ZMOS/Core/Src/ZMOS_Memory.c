@@ -73,7 +73,18 @@ typedef struct
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
+#if ZMOS_MEM_USE_HEAP
+     
+#define ZMOS_MEM_HEAP_BEGIN         ZMOS_HEAP_BEGIN
+#define ZMOS_MEM_HEAP_END           ZMOS_HEAP_END
+     
+/*#if (ZMOS_MEM_HEAP_END <= ZMOS_MEM_HEAP_BEGIN)
+#error "Error heap addr"
+#endif*/
+     
+#else
 static zm_uint8_t zmos_pool[ZMOS_MEM_SIZE];
+#endif
 
 /** pointer to the heap: for alignment, heap_ptr is now a pointer instead of an array */
 static zm_uint8_t *zmosMemHeap;
@@ -452,8 +463,11 @@ static void zmos_mem_free(void *ptr)
 *****************************************************************/
 void zmos_memoryMgrInit(void)
 {
+#if ZMOS_MEM_USE_HEAP
+    zmos_mem_init((void *)ZMOS_MEM_HEAP_BEGIN, (void *)ZMOS_MEM_HEAP_END);
+#else
     zmos_mem_init((void *)&zmos_pool[0], (void *)((zm_uint8_t *)&zmos_pool[ZMOS_MEM_SIZE - 1]));
-    
+#endif
 }
 /*****************************************************************
 * FUNCTION: zmos_malloc
