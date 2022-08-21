@@ -63,13 +63,41 @@ extern "C"
 #ifndef ZMOS_ALIGN_SIZE
 #define ZMOS_ALIGN_SIZE             4
 #endif
-
+/**
+ * @brief ZMOS memory management use heap.
+ *        1 : enable
+ *        0 : disable
+ */
+#ifndef ZMOS_MEM_USE_HEAP
+#define ZMOS_MEM_USE_HEAP           0
+#endif
+/** Use heap **/
+#if ZMOS_MEM_USE_HEAP
+/**
+ * @brief ZMOS memory heap begin address.
+ * 
+ */
+#ifndef ZMOS_HEAP_BEGIN
+#define ZMOS_HEAP_BEGIN             (0)
+#endif
+/**
+ * @brief ZMOS memory heap end address.
+ * 
+ */
+#ifndef ZMOS_HEAP_END
+#define ZMOS_HEAP_END               (0)
+#endif
+  
+/** Don't use heap **/
+#else
 /**
  * @brief ZMOS memory management pool size.
  * 
  */
 #ifndef ZMOS_MEM_SIZE
 #define ZMOS_MEM_SIZE               (8192)
+#endif
+    
 #endif
 /**
  * @brief Whether to enable memory statistics.
