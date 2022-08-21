@@ -148,8 +148,22 @@ extern "C"
  * ZMOS Get the minimin form a and b.
  */
 #define ZMOS_GET_MIN(a, b)            ((a) < (b) ? (a) : (b))
-    
-    
+   
+        
+/**
+ * ZMOS_ALIGN(size, align)
+ * Return the most contiguous size aligned at specified width. ZMOS_ALIGN(13, 4)
+ * would return 16.
+ */
+#define ZMOS_ALIGN(size, align)           (((size) + (align) - 1) & ~((align) - 1))
+
+/**
+ * ZMOS_ALIGN_DOWN(size, align)
+ * Return the down number of aligned at specified width. ZMOS_ALIGN_DOWN(13, 4)
+ * would return 12.
+ */
+#define ZMOS_ALIGN_DOWN(size, align)      ((size) & ~((align) - 1))
+        
 /**
  * Concatenates two parameters.
  */

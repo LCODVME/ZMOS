@@ -32,6 +32,7 @@ extern "C"
 #include "ZMOS_Cbtimer.h"
 #include "ZMOS_Tasks.h"
 #include "ZMOS_LowPwr.h"
+#include "ZMOS_Memory.h"
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
 #include "ZMOS_Section.h"
 #endif

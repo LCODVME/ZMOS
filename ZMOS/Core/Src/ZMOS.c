@@ -153,6 +153,11 @@ void zmos_system_init(void)
     zmosCriticalNesting = 0;
     // Initialize bsp
     bsp_init();
+    
+#if ZMOS_USE_MEM_MGR
+    // Initialize zmos memory management.
+    zmos_memoryMgrInit();
+#endif
     // Initialize zmos timer
     zmos_timerInit();
     
