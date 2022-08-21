@@ -46,6 +46,44 @@ extern "C"
 #endif
      
 /**
+ * @brief ZMOS use memory management.
+ *        1 : enable
+ *        0 : disable
+ */
+#ifndef ZMOS_USE_MEM_MGR
+#define ZMOS_USE_MEM_MGR            1
+#endif
+     
+#if ZMOS_USE_MEM_MGR
+/**
+ * @brief ZMOS memory management align size.
+ * 
+ * @note Preferably the same as the CPU.
+ */
+#ifndef ZMOS_ALIGN_SIZE
+#define ZMOS_ALIGN_SIZE             4
+#endif
+
+/**
+ * @brief ZMOS memory management pool size.
+ * 
+ */
+#ifndef ZMOS_MEM_SIZE
+#define ZMOS_MEM_SIZE               (8192)
+#endif
+/**
+ * @brief Whether to enable memory statistics.
+ *        1 : enable
+ *        0 : disable
+ *
+ */
+#ifndef ZMOS_MEM_STATS
+#define ZMOS_MEM_STATS              1
+#endif
+     
+#endif
+     
+/**
  * @brief ZMOS task maximum support event is the number.
  *        the value is 8¡¢16 or 32.
  *
