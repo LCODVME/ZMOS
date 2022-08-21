@@ -196,10 +196,12 @@ static void zmos_mem_init(void *beginAddr, void *endAddr)
     zmosMemEnd->prev = zmosMemSize + MEM_STRUCT_SIZE;
     
     lfree = pMem;
-    
+
+#if ZMOS_MEM_STATS
     memStats.maxSize = 0;
     memStats.usedSize = 0;
     //memStats.surpSize = zmosMemSize;
+#endif
 }
 
 /*****************************************************************
@@ -250,7 +252,7 @@ static void *zmos_mem_malloc(zm_size_t size)
                 pMem->next = ptr;
                 pMem->used = 1;
                 
-                if(mem->next != (zm_size_t)zmosMemEnd)
+                if(mem->next != (zmosMemSize + MEM_STRUCT_SIZE))
                 {
                     ((zmosMem_t *)&zmosMemHeap[mem->next])->prev = ptr;
                 }
@@ -355,7 +357,7 @@ static void *zmos_mem_realloc(void *ptr, zm_size_t newsize)
         
         pMem->next = idx2;
         
-        if(mem->next != (zm_size_t)zmosMemEnd)
+        if(mem->next != (zmosMemSize + MEM_STRUCT_SIZE))
         {
             ((zmosMem_t *)&zmosMemHeap[mem->next])->prev = idx2;
         }
