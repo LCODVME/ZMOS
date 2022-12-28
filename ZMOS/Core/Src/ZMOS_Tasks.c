@@ -112,7 +112,7 @@ taskReslt_t zmos_taskThreadRegister(zmos_taskHandle_t * const pTaskHandle, taskF
         srchTask = srchTask->next;
     }
     
-    newTask = (zmosTaskList_t *)zmos_mem_malloc(sizeof(zmosTaskList_t));
+    newTask = (zmosTaskList_t *)zmos_malloc(sizeof(zmosTaskList_t));
     if(newTask)
     {
         newTask->next = NULL;
@@ -179,7 +179,7 @@ void zmos_taskThreadUnregister(zmos_taskHandle_t pTaskHandle)
         {
             prevTask->next = srchTask->next;
         }
-        zmos_mem_free(srchTask);
+        zmos_free(srchTask);
     }
 }
 

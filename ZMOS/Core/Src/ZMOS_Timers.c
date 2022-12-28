@@ -311,7 +311,7 @@ void zmos_timeTickUpdate(uint32_t upTime)
         
         if(freeTimer)
         {
-            zmos_mem_free(freeTimer);
+            zmos_free(freeTimer);
         }
     }
 }
@@ -395,7 +395,7 @@ static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
             srchTimer = srchTimer->next;
         }
         //new timer
-        newTimer = (zmos_timer_t *)zmos_mem_malloc(sizeof(zmos_timer_t));
+        newTimer = (zmos_timer_t *)zmos_malloc(sizeof(zmos_timer_t));
         
         if(newTimer)
         {

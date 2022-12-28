@@ -59,6 +59,17 @@ typedef unsigned char bool;         //!< Boolean data type
 
 #endif
 
+typedef int8_t      zm_int8_t;
+typedef uint8_t     zm_uint8_t;
+
+typedef int16_t     zm_int16_t;
+typedef uint16_t    zm_uint16_t;
+
+typedef int32_t     zm_int32_t;
+typedef uint32_t    zm_uint32_t;
+
+typedef zm_uint32_t zm_size_t;
+
 /**
  * Task event types.
  */
