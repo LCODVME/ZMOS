@@ -323,6 +323,8 @@ static void *zmos_mem_realloc(void *ptr, zm_size_t newsize)
         zmos_mem_free(ptr);
         return NULL;
     }
+
+    if(newsize < MIN_SIZE_ALIGNED) newsize = MIN_SIZE_ALIGNED;
     
     if(ptr == NULL) return zmos_mem_malloc(newsize);
     
