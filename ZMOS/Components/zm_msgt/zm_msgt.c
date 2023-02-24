@@ -97,8 +97,21 @@ static void zm_msgtMsgGc(void);
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
-
-msgtReslt_t zm_msgtPublishMsg(msgtTopic_t topic, zm_uint8_t *msg, zm_msgLen_t msgLen)
+/*****************************************************************
+* FUNCTION: zm_msgtPublishMsg
+*
+* DESCRIPTION:
+*     This function to publish message at topic.
+* INPUTS:
+*     topic : Which topic to publish.
+*     msg : The message to publish.
+*     msgLen : message length.
+* RETURNS:
+*     publish result (@ref msgtResult_t).
+* NOTE:
+*     null
+*****************************************************************/
+msgtResult_t zm_msgtPublishMsg(msgtTopic_t topic, zm_uint8_t *msg, zm_msgLen_t msgLen)
 {
     if(!msg || !msgLen) return MSGT_ERR_PARAM;
     topicNode_t *srchNode = topicNodeListHead;
@@ -144,8 +157,23 @@ msgtReslt_t zm_msgtPublishMsg(msgtTopic_t topic, zm_uint8_t *msg, zm_msgLen_t ms
     }
     return MSGT_NO_TOPIC;
 }
-
-msgtReslt_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, zm_msgtNoticeFun_t noticFunc)
+/*****************************************************************
+* FUNCTION: zm_msgtSubscribeTopic
+*
+* DESCRIPTION:
+*     This function to subscribe topic.
+* INPUTS:
+*     client : Which client to subscribe.
+*     topic : Which topic to subscribe.
+*     noticFunc : The client is notified by this callback 
+*                 function when a message is published for 
+*                 the subscribed topic.
+* RETURNS:
+*     subscribe result (@ref msgtResult_t).
+* NOTE:
+*     null
+*****************************************************************/
+msgtResult_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, zm_msgtNoticeFun_t noticFunc)
 {
     topicNode_t *srchNode = topicNodeListHead;
     topicNode_t *prevNode = NULL;
@@ -255,8 +283,20 @@ msgtReslt_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, zm
     }
     return MSGT_OK;
 }
-
-msgtReslt_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
+/*****************************************************************
+* FUNCTION: zm_msgtUnsubscribeTopic
+*
+* DESCRIPTION:
+*     This function to unsubscribe topic.
+* INPUTS:
+*     client : Which client to unsubscribe.
+*     topic :  Unsubscribe topic.
+* RETURNS:
+*     subscribe result (@ref msgtResult_t).
+* NOTE:
+*     null
+*****************************************************************/
+msgtResult_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
 {
     topicNode_t *srchNode = topicNodeListHead;
     topicNode_t *prevTopicNode = NULL;
@@ -321,7 +361,19 @@ msgtReslt_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
     }
     return MSGT_OK;
 }
-
+/*****************************************************************
+* FUNCTION: zm_msgtGetMsg
+*
+* DESCRIPTION:
+*     This function to get client message.
+* INPUTS:
+*     client : Which client to get.
+* RETURNS:
+*     Message (@ref msgtMsg_t).
+*     If message len is 0, the client no have new message.
+* NOTE:
+*     null
+*****************************************************************/
 msgtMsg_t zm_msgtGetMsg(zm_msgtClient_t client)
 {
     msgtMsg_t pMsg;
@@ -343,7 +395,20 @@ msgtMsg_t zm_msgtGetMsg(zm_msgtClient_t client)
     }
     return pMsg;
 }
-
+/*****************************************************************
+* FUNCTION: zm_msgtGetTopicMsg
+*
+* DESCRIPTION:
+*     Gets information about the specified topic.
+* INPUTS:
+*     client : Which client to get.
+*     topic : Which topic.
+* RETURNS:
+*     Message (@ref msgtMsg_t).
+*     If message len is 0, the client no have new message at topic.
+* NOTE:
+*     null
+*****************************************************************/
 msgtMsg_t zm_msgtGetTopicMsg(zm_msgtClient_t client, msgtTopic_t topic)
 {
     msgtMsg_t pMsg;
@@ -368,12 +433,34 @@ msgtMsg_t zm_msgtGetTopicMsg(zm_msgtClient_t client, msgtTopic_t topic)
     }
     return pMsg;
 }
-
+/*****************************************************************
+* FUNCTION: zm_msgtInit
+*
+* DESCRIPTION:
+*     Msgt initialize.
+* INPUTS:
+*     null
+* RETURNS:
+*     null
+* NOTE:
+*     If enable ZMOS_INIT_SECTION,The user should not call it.
+*****************************************************************/
 void zm_msgtInit(void)
 {
     zmos_taskThreadRegister(&msgtTaskHandle, zm_msgtPorcessEvent);
 }
-
+/*****************************************************************
+* FUNCTION: zm_msgtPorcessEvent
+*
+* DESCRIPTION:
+*     ZMOS task, msgt event porcess.
+* INPUTS:
+*     
+* RETURNS:
+*     
+* NOTE:
+*     null
+*****************************************************************/
 static uTaskEvent_t zm_msgtPorcessEvent(uTaskEvent_t events)
 {
     if(events & ZM_MSGT_MSG_GC_EVENT)
@@ -383,7 +470,18 @@ static uTaskEvent_t zm_msgtPorcessEvent(uTaskEvent_t events)
     }
     return 0;
 }
-
+/*****************************************************************
+* FUNCTION: zm_msgtMsgGc
+*
+* DESCRIPTION:
+*     Msgt message garbage collection.
+* INPUTS:
+*     
+* RETURNS:
+*     
+* NOTE:
+*     null
+*****************************************************************/
 static void zm_msgtMsgGc(void)
 {
     topicNode_t *srchNode = topicNodeListHead;
