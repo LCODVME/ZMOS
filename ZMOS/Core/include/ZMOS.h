@@ -39,10 +39,12 @@ extern "C"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_PRIMAIRE_VERSION    1
-#define ZMOS_SUB_VERSION         3
-#define ZMOS_REVISED_VERSION     0
-#define VERSION_STRING          STRINGIFY(ZMOS_PRIMAIRE_VERSION.ZMOS_SUB_VERSION.ZMOS_REVISED_VERSION)
+#define ZMOS_PRIMAIRE_VERSION   (1)
+#define ZMOS_SUB_VERSION        (2)
+#define ZMOS_REVISED_VERSION    (1)
+    
+#define ZMOS_VERSION_NUMBER     ((ZMOS_PRIMAIRE_VERSION << 4) | (ZMOS_SUB_VERSION << 2) | ZMOS_REVISED_VERSION)
+#define ZMOS_VERSION_STRING     STRINGIFY(ZMOS_PRIMAIRE_VERSION.ZMOS_SUB_VERSION.ZMOS_REVISED_VERSION)
     
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
 
