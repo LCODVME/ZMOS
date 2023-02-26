@@ -38,8 +38,8 @@
  *************************************************************************************************************************/
 typedef struct zmos_timer
 {
-    uint32_t timeout;
-    uint32_t reloadTime;
+    zm_uint32_t timeout;
+    zm_uint32_t reloadTime;
     zmos_taskHandle_t taskHandle;
     uTaskEvent_t event;
     struct zmos_timer *next;
@@ -48,7 +48,7 @@ typedef struct zmos_timer
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
 /* Timer Clock */
-static uint32_t zmos_timerClock;
+static zm_uint32_t zmos_timerClock;
 static zmos_timer_t *timerListHead = NULL;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
@@ -62,7 +62,7 @@ static zmos_timer_t *timerListHead = NULL;
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
 static zmos_timer_t *zmos_findTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
-static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout);
+static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout);
 static void zmos_deleteTimer(zmos_timer_t *pTimer);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
@@ -100,7 +100,7 @@ void zmos_timerInit(void)
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout)
+timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout)
 {
     zmos_timer_t *newTimer;
     
@@ -124,7 +124,7 @@ timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout)
+timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout)
 {
     zmos_timer_t *newTimer;
     
@@ -177,7 +177,7 @@ timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
+zm_uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
 {
     zmos_timer_t *pTimer;
     
@@ -203,7 +203,7 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
+zm_uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event)
 {
     zmos_timer_t *pTimer;
     
@@ -228,9 +228,9 @@ uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event
 *     If the timer list is empty, then the returned timeout will 
 *     be TIMER_MAX_TIMEOUT.
 *****************************************************************/
-uint32_t zmos_getNextLowestTimeout(void)
+zm_uint32_t zmos_getNextLowestTimeout(void)
 {
-    uint32_t timeout = TIMER_MAX_TIMEOUT;
+    zm_uint32_t timeout = TIMER_MAX_TIMEOUT;
     zmos_timer_t *srchTimer = timerListHead;
     
     while(srchTimer)
@@ -255,7 +255,7 @@ uint32_t zmos_getNextLowestTimeout(void)
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_timeTickUpdate(uint32_t upTime)
+void zmos_timeTickUpdate(zm_uint32_t upTime)
 {
     zmos_timer_t *srchTimer;
     zmos_timer_t *prevTimer;
@@ -327,7 +327,7 @@ void zmos_timeTickUpdate(uint32_t upTime)
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getTimerClock(void)
+zm_uint32_t zmos_getTimerClock(void)
 {
     return zmos_timerClock;
 }
@@ -373,7 +373,7 @@ static zmos_timer_t *zmos_findTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t 
 * NOTE:
 *     null
 *****************************************************************/
-static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout)
+static zmos_timer_t *zmos_addTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout)
 {
     if(pTaskHandle)
     {

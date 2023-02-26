@@ -168,7 +168,7 @@ taskReslt_t zm_driverSetEvent(uTaskEvent_t events)
 *     If the event timer already exists, Timeout and Reload 
 *     properties will be updated.
 *****************************************************************/
-timerReslt_t zm_driverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload)
+timerReslt_t zm_driverSetTimerEvent(uTaskEvent_t events, zm_uint32_t timeout, bool reload)
 {
     if(reload)
     {

@@ -47,7 +47,7 @@ extern "C"
  * ZMOS timer result type.
  * @ref ZMOS timer return cordes.
  */
-typedef uint8_t timerReslt_t;
+typedef zm_uint8_t timerReslt_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -79,7 +79,7 @@ void zmos_timerInit(void);
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout);
+timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_startReloadTimer
 *
@@ -94,7 +94,7 @@ timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout);
+timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_stopTimer
 *
@@ -122,7 +122,7 @@ timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
+zm_uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 /*****************************************************************
 * FUNCTION: zmos_getReloadTime
 *
@@ -136,7 +136,7 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
+zm_uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 /*****************************************************************
 * FUNCTION: zmos_getNextLowestTimeout
 *
@@ -150,7 +150,7 @@ uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event
 *     If the timer list is empty, then the returned timeout will 
 *     be TIMER_MAX_TIMEOUT.
 *****************************************************************/
-uint32_t zmos_getNextLowestTimeout(void);
+zm_uint32_t zmos_getNextLowestTimeout(void);
 /*****************************************************************
 * FUNCTION: zmos_timeTickUpdate
 *
@@ -163,7 +163,7 @@ uint32_t zmos_getNextLowestTimeout(void);
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_timeTickUpdate(uint32_t upTime);
+void zmos_timeTickUpdate(zm_uint32_t upTime);
 /*****************************************************************
 * FUNCTION: zmos_getTimerClock
 *
@@ -176,7 +176,7 @@ void zmos_timeTickUpdate(uint32_t upTime);
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getTimerClock(void);
+zm_uint32_t zmos_getTimerClock(void);
 
 
 #ifdef __cplusplus

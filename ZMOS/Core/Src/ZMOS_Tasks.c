@@ -320,7 +320,7 @@ void zmos_taskStartScheduler(void)
 * NOTE:
 *     null
 *****************************************************************/
-uint8_t zmos_checkTaskIsIdle(void)
+zm_uint8_t zmos_checkTaskIsIdle(void)
 {
     if(zmos_getReadyTask())
     {

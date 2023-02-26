@@ -108,11 +108,11 @@ extern "C"
  * zm key type define.
  */
 #if (ZM_KEY_MAX_NUM < 8)
-typedef uint8_t zmKeyType_t;
+typedef zm_uint8_t zmKeyType_t;
 #elif (ZM_KEY_MAX_NUM < 16)
-typedef uint16_t zmKeyType_t;
+typedef zm_uint16_t zmKeyType_t;
 #else
-typedef uint32_t zmKeyType_t;
+typedef zm_uint32_t zmKeyType_t;
 #endif
 /**
  * zm key events enum.
@@ -157,14 +157,14 @@ typedef struct zmKeyEventState
 {
     union
     {
-        uint8_t pressNum;
+        zm_uint8_t pressNum;
 #if ZM_KEY_USE_LONG_PRESS
-        uint32_t pressLongTime;
+        zm_uint32_t pressLongTime;
 #endif
     }status;
     zmKeyEvent_t keyEvent;
 #if ZM_KEY_USE_PRESS_DOWN_TIME_RECORD
-    uint32_t pressTime;
+    zm_uint32_t pressTime;
 #endif
 }zmKeyEventState_t;
 /**
@@ -183,7 +183,7 @@ typedef void (* zmKeyEventCb)(zmKeyType_t key, zmKeyEventState_t keyEventState);
  *
  * @note : config by zm_setKeyConfig, confItem ZM_KEY_CONF_READ_LEVEL_FUNC.
  */
-typedef uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
+typedef zm_uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -208,7 +208,7 @@ typedef uint8_t (* readKeyLevelFunc)(zmKeyType_t key);
 * NOTE:
 *     null
 *****************************************************************/
-void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, uint32_t respEvent, zmKeyEventCb keyCallback);
+void zm_keyRegister(zmKeyType_t keys, zm_uint8_t keyActive, zm_uint32_t respEvent, zmKeyEventCb keyCallback);
 /*****************************************************************
 * FUNCTION: zm_keyUnregister
 *
@@ -289,7 +289,7 @@ void zm_keyPollStop(void);
 *     If the confItem is ZM_KEY_CONF_POLL_TIME, 
 *     the keys can be arbitrary.
 *****************************************************************/
-void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val);
+void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, zm_uint32_t val);
 /*****************************************************************
 * FUNCTION: zm_setReadKeyLevelFunc
 *

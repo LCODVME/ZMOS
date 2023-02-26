@@ -43,7 +43,7 @@
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-static uint32_t zmos_lowPwrEvents = 0;
+static zm_uint32_t zmos_lowPwrEvents = 0;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -91,7 +91,7 @@ void zmos_lowPwrMgrInit(void)
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event)
+void zmos_lowPwrSetEvent(zm_uint8_t event)
 {
     if(event < 32)
     {
@@ -110,7 +110,7 @@ void zmos_lowPwrSetEvent(uint8_t event)
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrClearEvent(uint8_t event)
+void zmos_lowPwrClearEvent(zm_uint8_t event)
 {
     if(event < 32)
     {
@@ -138,7 +138,7 @@ void zmos_lowPowerManagement(void)
 #endif
            )
     {
-        uint32_t nextTimeout;
+        zm_uint32_t nextTimeout;
 
         ZMOS_ENTER_CRITICAL();
         // Get next timeout
@@ -155,8 +155,8 @@ void zmos_lowPowerManagement(void)
 }
 #else
 void zmos_lowPwrMgrInit(void) {}
-void zmos_lowPwrSetEvent(uint8_t event) {}
-void zmos_lowPwrClearEvent(uint8_t event) {}
+void zmos_lowPwrSetEvent(zm_uint8_t event) {}
+void zmos_lowPwrClearEvent(zm_uint8_t event) {}
 void zmos_lowPowerManagement(void) {}
 #endif
 /****************************************************** END OF FILE ******************************************************/

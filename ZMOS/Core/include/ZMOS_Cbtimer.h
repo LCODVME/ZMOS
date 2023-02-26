@@ -46,7 +46,7 @@ typedef void (* cbTimerFunction)(void *param);
 /**
  * Callback timer id type.
  */
-typedef uint8_t cbTimerId_t;
+typedef zm_uint8_t cbTimerId_t;
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -78,7 +78,7 @@ void zmos_cbTimerInit(void);
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
+timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
 * FUNCTION: zmos_startReloadCbtimer
 *
@@ -94,7 +94,7 @@ timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
+timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
 * FUNCTION: zmos_changeCbTimerTimeout
 *
@@ -108,7 +108,7 @@ timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout);
+timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_stopCbtimer
 *

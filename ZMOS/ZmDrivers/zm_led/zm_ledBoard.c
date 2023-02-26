@@ -71,7 +71,7 @@
 * NOTE:
 *     null
 *****************************************************************/
-__weak void zm_ledBoardOnOff(zmLedType_t led, uint8_t mode)
+__weak void zm_ledBoardOnOff(zmLedType_t led, zm_uint8_t mode)
 {
     switch(led)
     {

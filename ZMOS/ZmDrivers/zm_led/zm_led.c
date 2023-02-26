@@ -47,19 +47,19 @@ typedef struct
 {
     union
     {
-        uint8_t num;
-        uint32_t timeout;
+        zm_uint8_t num;
+        zm_uint32_t timeout;
     }u;
     zmCycMode_t mode;
 }zmBlinkCyc_t;
 
 typedef struct
 {
-    uint8_t mode;       /* Operation mode */
+    zm_uint8_t mode;       /* Operation mode */
     zmBlinkCyc_t cyc;       /* Blink cycles left */
-    uint8_t onPct;      /* On cycle percentage */
-    uint16_t period;      /* On/off cycle time (msec) */
-    uint32_t next;      /* Time for next change */
+    zm_uint8_t onPct;      /* On cycle percentage */
+    zm_uint16_t period;      /* On/off cycle time (msec) */
+    zm_uint32_t next;      /* Time for next change */
 }zmLedControl_t;
 
 typedef struct
@@ -86,11 +86,11 @@ static zmLedStatus_t zmLedCtrlStatus;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-static void zm_ledOnOff(zmLedType_t leds, uint8_t mode);
+static void zm_ledOnOff(zmLedType_t leds, zm_uint8_t mode);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-extern void zm_ledBoardOnOff(zmLedType_t led, uint8_t mode);
+extern void zm_ledBoardOnOff(zmLedType_t led, zm_uint8_t mode);
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -123,7 +123,7 @@ void zm_ledInit(void)
 * NOTE:
 *     null
 *****************************************************************/
-void zm_ledSet(zmLedType_t leds, uint8_t mode)
+void zm_ledSet(zmLedType_t leds, zm_uint8_t mode)
 {
 #ifdef ZM_LED_BLINK
     zmLedType_t led;
@@ -184,7 +184,7 @@ void zm_ledSet(zmLedType_t leds, uint8_t mode)
 * NOTE:
 *     null
 *****************************************************************/
-void zm_ledOnTime(zmLedType_t leds, uint32_t time)
+void zm_ledOnTime(zmLedType_t leds, zm_uint32_t time)
 {
     if(leds >= BS(ZM_LED_MAX_NUM)) return;
     
@@ -214,7 +214,7 @@ void zm_ledOnTime(zmLedType_t leds, uint32_t time)
 * NOTE:
 *     null
 *****************************************************************/
-void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uint16_t period)
+void zm_ledSetBlinkNum(zmLedType_t leds, zm_uint8_t numBlinks, zm_uint8_t percent, zm_uint16_t period)
 {
 #ifdef ZM_LED_BLINK
     zmLedType_t led;
@@ -282,7 +282,7 @@ void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uin
 * NOTE:
 *     null
 *****************************************************************/
-void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, uint16_t period)
+void zm_ledSetBlinkTime(zmLedType_t leds, zm_uint32_t timeBlinks, zm_uint8_t percent, zm_uint16_t period)
 {
 #ifdef ZM_LED_BLINK
     zmLedType_t led;
@@ -349,7 +349,7 @@ void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, 
 * NOTE:
 *     null
 *****************************************************************/
-void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period)
+void zmos_ledSetToggleNum(zmLedType_t leds, zm_uint8_t numToggles, zm_uint16_t period)
 {
 #ifdef ZM_LED_BLINK
     zmLedType_t led;
@@ -387,7 +387,7 @@ void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period)
                     {
                         stu->mode ^= ZM_LED_MODE_ON;
                         zm_ledOnOff(led, stu->mode & ZM_LED_MODE_ON);
-                        stu->next +=(((uint32_t)stu->onPct * (uint32_t)stu->period) / 100);
+                        stu->next +=(((zm_uint32_t)stu->onPct * (zm_uint32_t)stu->period) / 100);
                     }
                 }
                 leds ^= led;
@@ -419,7 +419,7 @@ void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period)
 * NOTE:
 *     null
 *****************************************************************/
-void zm_ledSetToggleTime(zmLedType_t leds, uint32_t timeToggles, uint16_t period)
+void zm_ledSetToggleTime(zmLedType_t leds, zm_uint32_t timeToggles, zm_uint16_t period)
 {
 #ifdef ZM_LED_BLINK
     //zmLedType_t led;
@@ -479,11 +479,11 @@ void zm_updateLedBlink(void)
 {
     zmLedType_t led;
     zmLedType_t leds;
-    uint8_t pct;
-    uint16_t next;
-    uint16_t wait;
-    uint32_t pass;
-    uint32_t time;
+    zm_uint8_t pct;
+    zm_uint16_t next;
+    zm_uint16_t wait;
+    zm_uint32_t pass;
+    zm_uint32_t time;
     zmLedControl_t *stu;
     
     next = 0;
@@ -539,7 +539,7 @@ void zm_updateLedBlink(void)
                     
                     if(stu->mode & ZM_LED_MODE_BLINK)
                     {
-                        wait = (((uint32_t)pct * (uint32_t)stu->period) / 100);
+                        wait = (((zm_uint32_t)pct * (zm_uint32_t)stu->period) / 100);
                         stu->next = time + wait;
                     }
                     else
@@ -584,7 +584,7 @@ void zm_updateLedBlink(void)
 * NOTE:
 *     null
 *****************************************************************/
-static void zm_ledOnOff(zmLedType_t leds, uint8_t mode)
+static void zm_ledOnOff(zmLedType_t leds, zm_uint8_t mode)
 {
     zmLedType_t led;
     
@@ -614,9 +614,9 @@ static void zm_ledOnOff(zmLedType_t leds, uint8_t mode)
 }
 #else
 void zm_ledInit(void) {}
-void zm_ledSet(zmLedType_t leds, uint8_t mode) {}
-void zm_ledOnTime(zmLedType_t leds, uint32_t time) {}
-void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uint16_t period) {}
-void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, uint16_t period) {}
+void zm_ledSet(zmLedType_t leds, zm_uint8_t mode) {}
+void zm_ledOnTime(zmLedType_t leds, zm_uint32_t time) {}
+void zm_ledSetBlinkNum(zmLedType_t leds, zm_uint8_t numBlinks, zm_uint8_t percent, zm_uint16_t period) {}
+void zm_ledSetBlinkTime(zmLedType_t leds, zm_uint32_t timeBlinks, zm_uint8_t percent, zm_uint16_t period) {}
 #endif
 /****************************************************** END OF FILE ******************************************************/

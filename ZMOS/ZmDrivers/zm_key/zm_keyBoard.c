@@ -70,7 +70,7 @@
 * NOTE:
 *     null
 *****************************************************************/
-__weak uint8_t zm_keyBoardReadLevel(zmKeyType_t key)
+__weak zm_uint8_t zm_keyBoardReadLevel(zmKeyType_t key)
 {
     switch(key)
     {

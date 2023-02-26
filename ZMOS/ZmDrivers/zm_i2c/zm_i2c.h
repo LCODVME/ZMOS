@@ -85,11 +85,11 @@ typedef enum
  * zm i2c type define.
  */
 #if (ZM_I2C_MAX_NUM < 8)
-typedef uint8_t zmI2cType_t;
+typedef zm_uint8_t zmI2cType_t;
 #elif (ZM_I2C_MAX_NUM < 16)
-typedef uint16_t zmI2cType_t;
+typedef zm_uint16_t zmI2cType_t;
 #else
-typedef uint32_t zmI2cType_t;
+typedef zm_uint32_t zmI2cType_t;
 #endif
 
 /**
@@ -97,7 +97,7 @@ typedef uint32_t zmI2cType_t;
  *
  * @param[in] us : Microseconds of delay.
  */
-typedef void (* zmI2cDelayUsFunc)(uint8_t us);
+typedef void (* zmI2cDelayUsFunc)(zm_uint8_t us);
 /**
  * zm i2c set pin value function type.
  *
@@ -219,11 +219,11 @@ zmI2cRes_t zm_i2cClearBus(zmI2cType_t i2c);
 *     
 *****************************************************************/
 zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
-                      uint8_t slaveAddr,
-                      uint8_t *regAddr,
-                      uint8_t regAddrLen,
-                      uint8_t *buf,
-                      uint16_t dataLen);
+                      zm_uint8_t slaveAddr,
+                      zm_uint8_t *regAddr,
+                      zm_uint8_t regAddrLen,
+                      zm_uint8_t *buf,
+                      zm_uint16_t dataLen);
 /*****************************************************************
 * FUNCTION: zm_i2cReceive
 *
@@ -242,11 +242,11 @@ zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
 *     
 *****************************************************************/
 zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
-                         uint8_t slaveAddr,
-                         uint8_t *regAddr,
-                         uint8_t regAddrLen,
-                         uint8_t *buf,
-                         uint16_t dataLen);
+                         zm_uint8_t slaveAddr,
+                         zm_uint8_t *regAddr,
+                         zm_uint8_t regAddrLen,
+                         zm_uint8_t *buf,
+                         zm_uint16_t dataLen);
 
     
 #ifdef __cplusplus

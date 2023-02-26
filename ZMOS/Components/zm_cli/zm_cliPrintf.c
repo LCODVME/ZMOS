@@ -61,8 +61,7 @@ static void buffer_add(zm_printf_ctx_t * const p_ctx, char c);
 
 
 void zm_printf(zm_printf_ctx_t * const p_ctx,
-                 char const *              p_fmt,
-                                           ...)
+                 char const *p_fmt, ...)
 {
     ASSERT(p_ctx != NULL);
     ASSERT(p_ctx->fwrite != NULL);
@@ -100,7 +99,7 @@ void zm_printf_buffer_flush(zm_printf_ctx_t * const p_ctx)
 #if ZM_FPRINTF_DOUBLE
 
 static void fill_space(zm_printf_ctx_t * const p_ctx,
-                       uint8_t len,
+                       zm_uint8_t len,
                        bool zeros)
 {
     for (; len > 0; len--)
@@ -135,17 +134,17 @@ static void buffer_add(zm_printf_ctx_t * const p_ctx, char c)
 }
 
 static void unsigned_print(zm_printf_ctx_t * const p_ctx,
-                           uint32_t                  v,
-                           uint32_t                  Base,
-                           uint32_t                  NumDigits,
-                           uint32_t                  FieldWidth,
-                           uint32_t                  FormatFlags)
+                           zm_uint32_t v,
+                           zm_uint32_t Base,
+                           zm_uint32_t NumDigits,
+                           zm_uint32_t FieldWidth,
+                           zm_uint32_t FormatFlags)
 {
     static const char _aV2C[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                    'A', 'B', 'C', 'D', 'E', 'F' };
-    uint32_t Div;
-    uint32_t Value;
-    uint32_t Width;
+    zm_uint32_t Div;
+    zm_uint32_t Value;
+    zm_uint32_t Width;
     char c;
 
     Value = v;
@@ -241,14 +240,14 @@ static void unsigned_print(zm_printf_ctx_t * const p_ctx,
 
 
 static void int_print(zm_printf_ctx_t * const p_ctx,
-                      int32_t                   v,
-                      uint32_t                  Base,
-                      uint32_t                  NumDigits,
-                      uint32_t                  FieldWidth,
-                      uint32_t                  FormatFlags)
+                      zm_int32_t v,
+                      zm_uint32_t Base,
+                      zm_uint32_t NumDigits,
+                      zm_uint32_t FieldWidth,
+                      zm_uint32_t FormatFlags)
 {
-    uint32_t Width;
-    int32_t Number;
+    zm_uint32_t Width;
+    zm_int32_t Number;
 
     Number = (v < 0) ? -v : v;
 
@@ -256,9 +255,9 @@ static void int_print(zm_printf_ctx_t * const p_ctx,
     // Get actual field width
     //
     Width = 1u;
-    while (Number >= (int32_t)Base)
+    while (Number >= (zm_int32_t)Base)
     {
-        Number = (Number / (int32_t)Base);
+        Number = (Number / (zm_int32_t)Base);
         Width++;
     }
     if (NumDigits > Width)
@@ -319,15 +318,15 @@ static void int_print(zm_printf_ctx_t * const p_ctx,
     //
     // Print number without sign
     //
-    unsigned_print(p_ctx, (uint32_t)v, Base, NumDigits, FieldWidth, FormatFlags);
+    unsigned_print(p_ctx, (zm_uint32_t)v, Base, NumDigits, FieldWidth, FormatFlags);
 }
 
 static void string_print(zm_printf_ctx_t * const p_ctx,
-                         char const *              p_str,
-                         uint32_t                  FieldWidth,
-                         uint32_t                  FormatFlags)
+                         char const *p_str,
+                         zm_uint32_t FieldWidth,
+                         zm_uint32_t FormatFlags)
 {
-    uint32_t Width = 0;
+    zm_uint32_t Width = 0;
     char c;
 
     if ((FormatFlags & ZM_CLI_FORMAT_FLAG_LEFT_JUSTIFY) == ZM_CLI_FORMAT_FLAG_LEFT_JUSTIFY)
@@ -370,17 +369,17 @@ static void string_print(zm_printf_ctx_t * const p_ctx,
 #if ZM_FPRINTF_DOUBLE
 
 static void float_print(zm_printf_ctx_t * const p_ctx,
-                        double                    v,
-                        uint32_t                  digits,
-                        uint32_t                  width,
-                        uint32_t                  format,
-                        bool                      uppercase)
+                        double v,
+                        zm_uint32_t digits,
+                        zm_uint32_t width,
+                        zm_uint32_t format,
+                        bool uppercase)
 {
     bool sign, transform = false;
     uint64_t num, mant, lead, low, base, res, carry, x, s0, s1, s2, s3, fr;
-    int32_t exp;
-    uint8_t highest, offset, lead_len = 0, skipped = 0;
-    uint8_t precision = digits ? digits + 1 : ZM_CLI_FORMAT_DOUBLE_DEF_PRECISION + 1;
+    zm_int32_t exp;
+    zm_uint8_t highest, offset, lead_len = 0, skipped = 0;
+    zm_uint8_t precision = digits ? digits + 1 : ZM_CLI_FORMAT_DOUBLE_DEF_PRECISION + 1;
     /* Default digits should be -1, because 0 could be a requirement, not the default.
      * This should be changed for the whole library.
      */
@@ -483,7 +482,7 @@ static void float_print(zm_printf_ctx_t * const p_ctx,
     highest = (offset - skipped);
     base = 1;
 
-    for(uint8_t i = 0; i < precision; i++)
+    for(zm_uint8_t i = 0; i < precision; i++)
     {
         base *= 10;
     }
@@ -531,7 +530,7 @@ static void float_print(zm_printf_ctx_t * const p_ctx,
     /* Maximum precision handled by int_print() is 10 */
     if (precision > 10)
     {
-        for (uint8_t delta = precision - 10; delta > 0; delta--)
+        for (zm_uint8_t delta = precision - 10; delta > 0; delta--)
         {
             fr /= 10;
         }
@@ -557,7 +556,7 @@ static void float_print(zm_printf_ctx_t * const p_ctx,
 
     if (width && (!(format & ZM_CLI_FORMAT_FLAG_LEFT_JUSTIFY)))
     {
-        int32_t space = width - lead_len - precision - ZM_CLI_FORMAT_REQ_SIGN_SPACE(sign, format) - 1;
+        zm_int32_t space = width - lead_len - precision - ZM_CLI_FORMAT_REQ_SIGN_SPACE(sign, format) - 1;
         if (space > 0)
         {
             fill_space(p_ctx, space, format & ZM_CLI_FORMAT_FLAG_PAD_ZERO);
@@ -589,7 +588,7 @@ static void float_print(zm_printf_ctx_t * const p_ctx,
 
     if (width && (format & ZM_CLI_FORMAT_FLAG_LEFT_JUSTIFY))
     {
-        int32_t space = width - lead_len - precision - ZM_CLI_FORMAT_REQ_SIGN_SPACE(sign, format) - 1;
+        zm_int32_t space = width - lead_len - precision - ZM_CLI_FORMAT_REQ_SIGN_SPACE(sign, format) - 1;
         if (space > 0)
         {
             fill_space(p_ctx, space, false);
@@ -600,8 +599,8 @@ static void float_print(zm_printf_ctx_t * const p_ctx,
 #endif
 
 void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
-                   char const *               p_fmt,
-                   va_list *                  p_args)
+                   char const *p_fmt,
+                   va_list *p_args)
 {
     ASSERT(p_ctx != NULL);
 
@@ -615,10 +614,10 @@ void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
     }
 
     char c;
-    int32_t v;
-    uint32_t NumDigits;
-    uint32_t FormatFlags;
-    uint32_t FieldWidth;
+    zm_int32_t v;
+    zm_uint32_t NumDigits;
+    zm_uint32_t FormatFlags;
+    zm_uint32_t FieldWidth;
 
     do
     {
@@ -727,14 +726,14 @@ void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
                 case 'c':
                 {
                     char c0;
-                    v = va_arg(*p_args, int32_t);
+                    v = va_arg(*p_args, zm_int32_t);
                     c0 = (char)v;
                     buffer_add(p_ctx, c0);
                     break;
                 }
                 case 'd':
                 case 'i':
-                    v = va_arg(*p_args, int32_t);
+                    v = va_arg(*p_args, zm_int32_t);
                     int_print(p_ctx,
                               v,
                               10u,
@@ -743,9 +742,9 @@ void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
                               FormatFlags);
                     break;
                 case 'u':
-                    v = va_arg(*p_args, int32_t);
+                    v = va_arg(*p_args, zm_int32_t);
                     unsigned_print(p_ctx,
-                                   (uint32_t)v,
+                                   (zm_uint32_t)v,
                                    10u,
                                    NumDigits,
                                    FieldWidth,
@@ -753,9 +752,9 @@ void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
                     break;
                 case 'x':
                 case 'X':
-                    v = va_arg(*p_args, int32_t);
+                    v = va_arg(*p_args, zm_int32_t);
                     unsigned_print(p_ctx,
-                                   (uint32_t)v,
+                                   (zm_uint32_t)v,
                                    16u,
                                    NumDigits,
                                    FieldWidth,
@@ -768,10 +767,10 @@ void zm_printf_fmt(zm_printf_ctx_t * const p_ctx,
                     break;
                 }
                 case 'p':
-                    v = va_arg(*p_args, int32_t);
+                    v = va_arg(*p_args, zm_int32_t);
                     buffer_add(p_ctx, '0');
                     buffer_add(p_ctx, 'x');
-                    unsigned_print(p_ctx, (uint32_t)v, 16u, 8u, 8u, 0);
+                    unsigned_print(p_ctx, (zm_uint32_t)v, 16u, 8u, 8u, 0);
                     break;
                 case '%':
                     buffer_add(p_ctx, '%');

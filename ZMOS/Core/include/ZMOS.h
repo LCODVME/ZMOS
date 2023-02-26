@@ -40,7 +40,7 @@ extern "C"
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
 #define ZMOS_PRIMAIRE_VERSION    1
-#define ZMOS_SUB_VERSION         2
+#define ZMOS_SUB_VERSION         3
 #define ZMOS_REVISED_VERSION     0
 #define VERSION_STRING          STRINGIFY(ZMOS_PRIMAIRE_VERSION.ZMOS_SUB_VERSION.ZMOS_REVISED_VERSION)
     
@@ -306,7 +306,7 @@ zmos_taskHandle_t zmos_getCurrentTaskHandle(void);
 * NOTE:
 *     null
 *****************************************************************/
-uint8_t zmos_checkTaskIsIdle(void);
+zm_uint8_t zmos_checkTaskIsIdle(void);
 
 
 /*********************************** ZMOS timer interface ***************************************************************/
@@ -325,7 +325,7 @@ uint8_t zmos_checkTaskIsIdle(void);
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout);
+timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_startReloadTimer
 *
@@ -340,7 +340,7 @@ timerReslt_t zmos_startSingleTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t e
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, uint32_t timeout);
+timerReslt_t zmos_startReloadTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_stopTimer
 *
@@ -368,7 +368,7 @@ timerReslt_t zmos_stopTimer(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
+zm_uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 /*****************************************************************
 * FUNCTION: zmos_getReloadTime
 *
@@ -382,7 +382,7 @@ uint32_t zmos_getCurrentTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t even
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
+zm_uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event);
 /*****************************************************************
 * FUNCTION: zmos_getNextLowestTimeout
 *
@@ -396,7 +396,7 @@ uint32_t zmos_getReloadTimeout(zmos_taskHandle_t pTaskHandle, uTaskEvent_t event
 *     If the timer list is empty, then the returned timeout will 
 *     be TIMER_MAX_TIMEOUT.
 *****************************************************************/
-uint32_t zmos_getNextLowestTimeout(void);
+zm_uint32_t zmos_getNextLowestTimeout(void);
 /*****************************************************************
 * FUNCTION: zmos_getTimerClock
 *
@@ -409,7 +409,7 @@ uint32_t zmos_getNextLowestTimeout(void);
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t zmos_getTimerClock(void);
+zm_uint32_t zmos_getTimerClock(void);
 
 
 /*********************************** ZMOS cbtimer interface ***************************************************************/
@@ -429,7 +429,7 @@ uint32_t zmos_getTimerClock(void);
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
+timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
 * FUNCTION: zmos_startReloadCbtimer
 *
@@ -445,7 +445,7 @@ timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc);
+timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc);
 /*****************************************************************
 * FUNCTION: zmos_changeCbTimerTimeout
 *
@@ -459,7 +459,7 @@ timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout);
+timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, zm_uint32_t timeout);
 /*****************************************************************
 * FUNCTION: zmos_stopCbtimer
 *
@@ -593,7 +593,7 @@ zm_size_t zmos_getMemMaxUsed(void);
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event);
+void zmos_lowPwrSetEvent(zm_uint8_t event);
 /*****************************************************************
 * FUNCTION: zmos_lowPwrClearEvent
 *
@@ -606,7 +606,7 @@ void zmos_lowPwrSetEvent(uint8_t event);
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrClearEvent(uint8_t event);
+void zmos_lowPwrClearEvent(zm_uint8_t event);
 
 
 

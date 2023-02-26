@@ -68,7 +68,7 @@ void zmos_lowPwrMgrInit(void);
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrSetEvent(uint8_t event);
+void zmos_lowPwrSetEvent(zm_uint8_t event);
 /*****************************************************************
 * FUNCTION: zmos_lowPwrClearEvent
 *
@@ -81,7 +81,7 @@ void zmos_lowPwrSetEvent(uint8_t event);
 * NOTE:
 *     The bit 31 use by zmos system.
 *****************************************************************/
-void zmos_lowPwrClearEvent(uint8_t event);
+void zmos_lowPwrClearEvent(zm_uint8_t event);
 
 #ifdef __cplusplus
 }

@@ -50,7 +50,7 @@ extern "C"
  * ZMOS task result type.
  * @ref ZMOS task return cordes.
  */
-typedef uint8_t taskReslt_t;
+typedef zm_uint8_t taskReslt_t;
 /**
  * Zmos task handle.
  */
@@ -164,7 +164,7 @@ zmos_taskHandle_t zmos_getCurrentTaskHandle(void);
 * NOTE:
 *     null
 *****************************************************************/
-uint8_t zmos_checkTaskIsIdle(void);
+zm_uint8_t zmos_checkTaskIsIdle(void);
 
 
 #ifdef __cplusplus

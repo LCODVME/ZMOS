@@ -55,7 +55,7 @@ extern "C"
 * NOTE:
 *     null
 *****************************************************************/
-uint32_t bsp_getClockCount(void);
+zm_uint32_t bsp_getClockCount(void);
 
 #ifdef __cplusplus
 }

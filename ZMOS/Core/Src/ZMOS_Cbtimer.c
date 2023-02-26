@@ -109,7 +109,7 @@ void zmos_cbTimerInit(void)
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc)
+timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc)
 {
     cbTimerId_t cTimerId;
     if(zmos_addCbTimer(&cTimerId, param, cbfunc) == ZMOS_TIMER_SUCCESS)
@@ -142,7 +142,7 @@ timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc)
+timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc)
 {
     cbTimerId_t cTimerId;
     if(zmos_addCbTimer(&cTimerId, param, cbfunc) == ZMOS_TIMER_SUCCESS)
@@ -173,7 +173,7 @@ timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, voi
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout)
+timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, zm_uint32_t timeout)
 {
     if(timerId < ZMOS_USE_CBTIMERS_NUM)
     {
@@ -287,9 +287,9 @@ static timerReslt_t zmos_addCbTimer(cbTimerId_t *timerId, void *param, cbTimerFu
 
 #else
 void zmos_cbTimerInit(void) {}
-timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc) {return ZMOS_TIMER_FAILD;}
-timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, uint32_t timeout, void *param, cbTimerFunction cbfunc) {return ZMOS_TIMER_FAILD;}
-timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, uint32_t timeout) {return ZMOS_TIMER_FAILD;}
+timerReslt_t zmos_startSingleCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc) {return ZMOS_TIMER_FAILD;}
+timerReslt_t zmos_startReloadCbtimer(cbTimerId_t *timerId, zm_uint32_t timeout, void *param, cbTimerFunction cbfunc) {return ZMOS_TIMER_FAILD;}
+timerReslt_t zmos_changeCbTimerTimeout(cbTimerId_t timerId, zm_uint32_t timeout) {return ZMOS_TIMER_FAILD;}
 timerReslt_t zmos_stopCbtimer(cbTimerId_t timerId) {return ZMOS_TIMER_FAILD;}
 #endif
 /****************************************************** END OF FILE ******************************************************/

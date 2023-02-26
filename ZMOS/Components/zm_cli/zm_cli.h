@@ -98,11 +98,11 @@ extern "C"
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
 #if (ZM_CLI_CMD_BUFF_SIZE > 65535)
-    typedef uint32_t cli_cmd_len_t;
+    typedef zm_uint32_t cli_cmd_len_t;
 #elif (ZM_CLI_CMD_BUFF_SIZE > 255)
-    typedef uint16_t cli_cmd_len_t;
+    typedef zm_uint16_t cli_cmd_len_t;
 #else
-    typedef uint8_t cli_cmd_len_t;
+    typedef zm_uint8_t cli_cmd_len_t;
 #endif
     
 typedef enum
@@ -135,7 +135,7 @@ typedef struct
     cli_cmd_len_t cur_y_end;    // vertical cursor position at the end of command
     cli_cmd_len_t terminal_hei; // terminal screen height
     cli_cmd_len_t terminal_wid; // terminal screen width
-    uint8_t name_len;               // console name length
+    zm_uint8_t name_len;               // console name length
 } zm_cli_multiline_cons_t;
 
 typedef struct
@@ -163,7 +163,7 @@ typedef struct cli_def_entry cli_static_entry_t;
  *          marks the end of procedure initiated using API. API result, in this case, will only be
  *          an indicative of whether the procedure has been requested successfully.
  */
-typedef uint32_t ret_code_t;
+typedef zm_uint32_t ret_code_t;
 
 /**
  * Cli printf.
@@ -242,13 +242,13 @@ typedef struct
      * @param[in] length       Destination buffer length.
      * @return read data bytes.
      */
-    int (* read)(void *a_buf, uint16_t length);
+    int (* read)(void *a_buf, zm_uint16_t length);
     /**
      * @param[in] a_data       Pointer to the destination buffer.
      * @param[in] length       Destination buffer length.
      * @return write data bytes.
      */
-    int (* write)(const void *a_data, uint16_t length);
+    int (* write)(const void *a_data, zm_uint16_t length);
     
 }cli_trans_api_t;
 
@@ -265,22 +265,22 @@ typedef struct
  */
 typedef struct
 {
-    uint32_t insert_mode    : 1; //!< Enables or disables console insert mode for text introduction.
-    uint32_t show_help      : 1; //!< Shows help if the command was called with -h or --help parameter.
-    uint32_t use_colors     : 1; //!< Enables or disables colored syntax.
-    uint32_t echo           : 1; //!< Enables or disables CLI echo.
-    uint32_t processing     : 1; //!< CLI is executing process function.
-    uint32_t tx_rdy         : 1;
-    uint32_t tab            : 1;
-    uint32_t last_nl        : 8; //!< The last received newline character.
+    zm_uint32_t insert_mode    : 1; //!< Enables or disables console insert mode for text introduction.
+    zm_uint32_t show_help      : 1; //!< Shows help if the command was called with -h or --help parameter.
+    zm_uint32_t use_colors     : 1; //!< Enables or disables colored syntax.
+    zm_uint32_t echo           : 1; //!< Enables or disables CLI echo.
+    zm_uint32_t processing     : 1; //!< CLI is executing process function.
+    zm_uint32_t tx_rdy         : 1;
+    zm_uint32_t tab            : 1;
+    zm_uint32_t last_nl        : 8; //!< The last received newline character.
 } cli_flag_t;
-STATIC_ASSERT(sizeof(cli_flag_t) == sizeof(uint32_t));
+STATIC_ASSERT(sizeof(cli_flag_t) == sizeof(zm_uint32_t));
 /**
  * @internal @brief Union for internal CLI usage.
  */
 typedef union
 {
-    uint32_t value;
+    zm_uint32_t value;
     cli_flag_t flag;
 } cli_internal_t;
 /**
@@ -332,7 +332,7 @@ typedef struct cli_hist_pool_T
  */
 typedef struct
 {
-    uint8_t m_hist_num;   //!< number of history.
+    zm_uint8_t m_hist_num;   //!< number of history.
     cli_memory_api_t const * m_memory;
     cli_hist_pool_t * m_hist_head;    //!< Pointer to first history.
     cli_hist_pool_t * m_hist_tail;     //!< Pointer to the tail of history list.

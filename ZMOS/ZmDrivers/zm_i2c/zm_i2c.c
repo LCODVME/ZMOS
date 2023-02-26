@@ -76,9 +76,9 @@ static void zm_i2cStart(zmI2cType_t i2c);
 static void zm_i2cStop(zmI2cType_t i2c);
 static void zm_i2cAck(zmI2cType_t i2c);
 static void zm_i2cNotAck(zmI2cType_t i2c);
-static uint8_t zm_i2cGetAck(zmI2cType_t i2c);
-static void zm_i2cSendByte(zmI2cType_t i2c, uint8_t data);
-static uint8_t zm_i2cReadByte(zmI2cType_t i2c);
+static zm_uint8_t zm_i2cGetAck(zmI2cType_t i2c);
+static void zm_i2cSendByte(zmI2cType_t i2c, zm_uint8_t data);
+static zm_uint8_t zm_i2cReadByte(zmI2cType_t i2c);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -209,7 +209,7 @@ zmI2cRes_t zm_i2cClearBus(zmI2cType_t i2c)
     
     ZM_I2C_CHECK_INIT();
     
-    for(uint8_t i = 0; i < 9; i++)
+    for(zm_uint8_t i = 0; i < 9; i++)
     {
         ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSclPinValSet, ZM_I2C_PIN_LOW);
         ZM_I2C_DELAY_US(2);
@@ -239,11 +239,11 @@ zmI2cRes_t zm_i2cClearBus(zmI2cType_t i2c)
 *     
 *****************************************************************/
 zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
-                      uint8_t slaveAddr,
-                      uint8_t *regAddr,
-                      uint8_t regAddrLen,
-                      uint8_t *buf,
-                      uint16_t dataLen)
+                      zm_uint8_t slaveAddr,
+                      zm_uint8_t *regAddr,
+                      zm_uint8_t regAddrLen,
+                      zm_uint8_t *buf,
+                      zm_uint16_t dataLen)
 {
     if(i2c >= ZM_I2C_MAX_NUM) return ZM_I2C_PARAM_ERR;
     
@@ -257,7 +257,7 @@ zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
     
     if(regAddr)
     {
-        for(uint8_t i = 0; i < regAddrLen; i++)
+        for(zm_uint8_t i = 0; i < regAddrLen; i++)
         {
             zm_i2cSendByte(i2c, regAddr[i]);
             if(zm_i2cGetAck(i2c) == ZM_I2C_NOT_ACK) return ZM_I2C_FAIL;
@@ -266,7 +266,7 @@ zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
     
     if(buf)
     {
-        for(uint16_t i = 0; i < dataLen; i++)
+        for(zm_uint16_t i = 0; i < dataLen; i++)
         {
             zm_i2cSendByte(i2c, buf[i]);
             if(zm_i2cGetAck(i2c) == ZM_I2C_NOT_ACK) return ZM_I2C_FAIL;
@@ -298,11 +298,11 @@ zmI2cRes_t zm_i2cSend(zmI2cType_t i2c,
 *     
 *****************************************************************/
 zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
-                         uint8_t slaveAddr,
-                         uint8_t *regAddr,
-                         uint8_t regAddrLen,
-                         uint8_t *buf,
-                         uint16_t dataLen)
+                         zm_uint8_t slaveAddr,
+                         zm_uint8_t *regAddr,
+                         zm_uint8_t regAddrLen,
+                         zm_uint8_t *buf,
+                         zm_uint16_t dataLen)
 {
     if(i2c >= ZM_I2C_MAX_NUM) return ZM_I2C_PARAM_ERR;
     
@@ -316,7 +316,7 @@ zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
         
         if(zm_i2cGetAck(i2c) == ZM_I2C_NOT_ACK) return ZM_I2C_FAIL;
         
-        for(uint8_t i = 0; i < regAddrLen; i++)
+        for(zm_uint8_t i = 0; i < regAddrLen; i++)
         {
             zm_i2cSendByte(i2c, regAddr[i]);
             if(zm_i2cGetAck(i2c) == ZM_I2C_NOT_ACK) return ZM_I2C_FAIL;
@@ -331,7 +331,7 @@ zmI2cRes_t zm_i2cReceive(zmI2cType_t i2c,
         
         if(zm_i2cGetAck(i2c) == ZM_I2C_NOT_ACK) return ZM_I2C_FAIL;
         
-        for(uint16_t i = 0; i < dataLen;)
+        for(zm_uint16_t i = 0; i < dataLen;)
         {
             buf[i++] = zm_i2cReadByte(i2c);
             if(i < dataLen) zm_i2cAck(i2c);
@@ -481,9 +481,9 @@ static void zm_i2cNotAck(zmI2cType_t i2c)
 * NOTE:
 *     
 *****************************************************************/
-static uint8_t zm_i2cGetAck(zmI2cType_t i2c)
+static zm_uint8_t zm_i2cGetAck(zmI2cType_t i2c)
 {
-    uint32_t waitCnt = 0;
+    zm_uint32_t waitCnt = 0;
     
     ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSdaPinDirSet, ZM_I2C_PIN_IN);
     
@@ -520,13 +520,13 @@ static uint8_t zm_i2cGetAck(zmI2cType_t i2c)
 * NOTE:
 *     
 *****************************************************************/
-static void zm_i2cSendByte(zmI2cType_t i2c, uint8_t data)
+static void zm_i2cSendByte(zmI2cType_t i2c, zm_uint8_t data)
 {
     ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSdaPinDirSet, ZM_I2C_PIN_OUT);
     
     ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSclPinValSet, ZM_I2C_PIN_LOW);
     
-    for(uint8_t i = 0; i < 8; i++)
+    for(zm_uint8_t i = 0; i < 8; i++)
     {
         if(data & 0x80)
         {
@@ -560,13 +560,13 @@ static void zm_i2cSendByte(zmI2cType_t i2c, uint8_t data)
 * NOTE:
 *     
 *****************************************************************/
-static uint8_t zm_i2cReadByte(zmI2cType_t i2c)
+static zm_uint8_t zm_i2cReadByte(zmI2cType_t i2c)
 {
-    uint8_t data = 0;
+    zm_uint8_t data = 0;
     
     ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSdaPinDirSet, ZM_I2C_PIN_IN);
     
-    for(uint8_t i = 0; i < 8; i++)
+    for(zm_uint8_t i = 0; i < 8; i++)
     {
         ZM_I2C_PIN_FUNC(zmI2cStuTabel[i2c].i2cApi.i2cSclPinValSet, ZM_I2C_PIN_LOW);
         

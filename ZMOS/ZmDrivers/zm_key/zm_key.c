@@ -58,22 +58,22 @@
  *************************************************************************************************************************/
 typedef struct
 {
-    uint8_t keyLevel : 1;
-    uint8_t activeLevel : 1;
-    uint8_t debnceSte : 1;
-    uint8_t reserve : 5;
-    uint8_t debnceRem;  //debounce remaining time.
+    zm_uint8_t keyLevel : 1;
+    zm_uint8_t activeLevel : 1;
+    zm_uint8_t debnceSte : 1;
+    zm_uint8_t reserve : 5;
+    zm_uint8_t debnceRem;  //debounce remaining time.
 #if ZM_KEY_ENABLE_CUSTOM
-    uint8_t debnceTime;  //debounce time.
-    uint16_t shortIntvlTm;  //short press, release interval max time.
+    zm_uint8_t debnceTime;  //debounce time.
+    zm_uint16_t shortIntvlTm;  //short press, release interval max time.
 #if ZM_KEY_USE_LONG_PRESS
-    uint32_t longPressTime;
-    uint16_t holdCbInterval;
+    zm_uint32_t longPressTime;
+    zm_uint16_t holdCbInterval;
 #endif //ZM_KEY_USE_LONG_PRESS
 #endif //ZM_KEY_ENABLE_CUSTOM
-    uint32_t respEvent;
-    uint32_t timeRecord;
-    uint32_t next;
+    zm_uint32_t respEvent;
+    zm_uint32_t timeRecord;
+    zm_uint32_t next;
     zmKeyEventState_t eventStatus;
     zmKeyEventCb funcCb;
     readKeyLevelFunc readKeyLevel;
@@ -82,11 +82,11 @@ typedef struct
 /*************************************************************************************************************************
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
-static uint8_t zmKeyRun = 1;
+static zm_uint8_t zmKeyRun = 1;
 static zmKeyType_t keyReg = 0;
 static zmKeyStatus_t keyStatusTable[ZM_KEY_MAX_NUM];
 #if ZM_KEY_ENABLE_CUSTOM
-static uint16_t zmKeyPollPeriod = ZM_DEFAULT_POLL_TIME;
+static zm_uint16_t zmKeyPollPeriod = ZM_DEFAULT_POLL_TIME;
 #endif
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
@@ -99,11 +99,11 @@ static uint16_t zmKeyPollPeriod = ZM_DEFAULT_POLL_TIME;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-static uint8_t zm_readKeyLevel(zmKeyType_t key);
+static zm_uint8_t zm_readKeyLevel(zmKeyType_t key);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
-extern uint8_t zm_keyBoardReadLevel(zmKeyType_t key);
+extern zm_uint8_t zm_keyBoardReadLevel(zmKeyType_t key);
 /*************************************************************************************************************************
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -145,7 +145,7 @@ void zm_keyInit(void)
 * NOTE:
 *     null
 *****************************************************************/
-void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, uint32_t respEvent, zmKeyEventCb keyCallback)
+void zm_keyRegister(zmKeyType_t keys, zm_uint8_t keyActive, zm_uint32_t respEvent, zmKeyEventCb keyCallback)
 {
     if(keys >= BS(ZM_KEY_MAX_NUM)) return;
     zmKeyType_t key;
@@ -329,12 +329,12 @@ void zm_keyPollStop(void)
 *     If the confItem is ZM_KEY_CONF_POLL_TIME, 
 *     the keys can be arbitrary.
 *****************************************************************/
-void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val)
+void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, zm_uint32_t val)
 {
 #if ZM_KEY_ENABLE_CUSTOM
     if(confItem == ZM_KEY_CONF_POLL_TIME)
     {
-        zmKeyPollPeriod = (uint16_t )val;
+        zmKeyPollPeriod = (zm_uint16_t )val;
         return;
     }
 #endif
@@ -352,30 +352,30 @@ void zm_setKeyConfig(zmKeyType_t keys, zmKeyConfItem_t confItem, uint32_t val)
             switch(confItem)
             {
             case ZM_KEY_CONF_SET_RESP_EVENT:
-                stu->respEvent = (uint32_t )val;
+                stu->respEvent = (zm_uint32_t )val;
                 break;
             case ZM_KEY_CONF_SET_ACTIVE_LEVEL:
-                stu->activeLevel = (uint8_t )val;
+                stu->activeLevel = (zm_uint8_t )val;
                 break;
             case ZM_KEY_CONF_ADD_RESP_EVENT:
-                stu->respEvent |= (uint32_t )val;
+                stu->respEvent |= (zm_uint32_t )val;
                 break;
             case ZM_KEY_CONF_DEL_RESP_EVENT:
-                stu->respEvent &= ~(uint32_t )val;
+                stu->respEvent &= ~(zm_uint32_t )val;
                 break;
 #if ZM_KEY_ENABLE_CUSTOM
             case ZM_KEY_CONF_DEBOUNCE_TIME:
-                stu->debnceTime = (uint8_t )val;
+                stu->debnceTime = (zm_uint8_t )val;
                 break;
             case ZM_KEY_CONF_SHORT_TIME:
-                stu->shortIntvlTm = (uint16_t )val;
+                stu->shortIntvlTm = (zm_uint16_t )val;
                 break;
 #if ZM_KEY_USE_LONG_PRESS
             case ZM_KEY_CONF_LONG_TIME:
-                stu->longPressTime = (uint32_t )val;
+                stu->longPressTime = (zm_uint32_t )val;
                 break;
             case ZM_KEY_CONF_HOLD_TIME:
-                stu->holdCbInterval = (uint16_t )val;
+                stu->holdCbInterval = (zm_uint16_t )val;
                 break;
 #endif //ZM_KEY_USE_LONG_PRESS
 #endif //ZM_KEY_ENABLE_CUSTOM
@@ -442,10 +442,10 @@ void zm_keyPollProcess(void)
     key = ZM_KEY_1;
     keys = keyReg;
     stu = keyStatusTable;
-    uint8_t keyLevelVal;
-    uint32_t time;
-    uint32_t wait;
-    uint32_t next = ZM_KEY_POLL_PERIOD;
+    zm_uint8_t keyLevelVal;
+    zm_uint32_t time;
+    zm_uint32_t wait;
+    zm_uint32_t next = ZM_KEY_POLL_PERIOD;
     
     while(keys)
     {
@@ -632,7 +632,7 @@ void zm_keyPollProcess(void)
 * NOTE:
 *     null
 *****************************************************************/
-static uint8_t zm_readKeyLevel(zmKeyType_t key)
+static zm_uint8_t zm_readKeyLevel(zmKeyType_t key)
 {
     return zm_keyBoardReadLevel(key);
 }

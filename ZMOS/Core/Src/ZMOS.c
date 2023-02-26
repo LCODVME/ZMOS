@@ -31,7 +31,6 @@
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-//#define ZMOS_FUNC_INIT_SECTION_ITEM_GET(i)          ZM_SECTION_ITEM_GET(ZMOS_INIT_SECTION_NAME, zmos_funcInit_t, (i))
 #define ZMOS_FUN_INIT_SECTION_GET(section)          ZM_SECTION_START_ADDR(section);
 #define ZMOS_FUNC_INIT_SECTION_ITEM_COUNT(section)  ZM_SECTION_ITEM_COUNT(section, zmos_funcInit_t)
 #endif

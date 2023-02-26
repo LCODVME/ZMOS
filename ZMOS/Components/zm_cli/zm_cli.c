@@ -210,7 +210,7 @@ void zm_cli_print_stream(void const * p_user_ctx, char const * p_data, size_t da
 static void cli_cmd_init(void)
 {
     const char ** pp_sorted_cmds = CLI_SORTED_CMD_PTRS_START_ADDR_GET;
-    for(uint8_t i = 0; i < CLI_DATA_SECTION_ITEM_COUNT; i++)
+    for(zm_uint8_t i = 0; i < CLI_DATA_SECTION_ITEM_COUNT; i++)
     {
         const cli_cmd_entry_t * cmd;
         cmd = CLI_DATA_SECTION_ITEM_GET(i);
@@ -237,18 +237,18 @@ static inline void cursor_next_line_move(zm_cli_t const * p_cli)
 #define ZM_CLI_ASCII_MAX_CHAR (127u)
 static inline ret_code_t ascii_filter(char const data)
 {
-    return (uint8_t)data > ZM_CLI_ASCII_MAX_CHAR ? ZM_ERROR_INVALID_DATA : ZM_SUCCESS;
+    return (zm_uint8_t)data > ZM_CLI_ASCII_MAX_CHAR ? ZM_ERROR_INVALID_DATA : ZM_SUCCESS;
 }
 
 static inline void receive_state_change(zm_cli_t const * p_cli, cli_receive_t state)
 {
     p_cli->m_ctx->receive_state = state;
 }
-static inline void cli_flag_last_nl_set(zm_cli_t const * p_cli, uint8_t val)
+static inline void cli_flag_last_nl_set(zm_cli_t const * p_cli, zm_uint8_t val)
 {
     p_cli->m_ctx->internal.flag.last_nl = val;
 }
-static inline uint8_t cli_flag_last_nl_get(zm_cli_t const * p_cli)
+static inline zm_uint8_t cli_flag_last_nl_get(zm_cli_t const * p_cli)
 {
     return p_cli->m_ctx->internal.flag.last_nl;
 }
@@ -342,7 +342,7 @@ static inline void cli_flag_help_clear(zm_cli_t const * p_cli)
     p_cli->m_ctx->internal.flag.show_help = 0;
 }
 /* Functions returns true if new line character shall be processed */
-static bool process_nl(zm_cli_t const * p_cli, uint8_t data)
+static bool process_nl(zm_cli_t const * p_cli, zm_uint8_t data)
 {
     if(data != '\t') cli_flag_tab_set(p_cli, false);
     if ((data != '\r') && (data != '\n'))
@@ -369,10 +369,10 @@ static inline void history_mode_exit(zm_cli_t const * p_cli)
 
 #if ZM_MODULE_ENABLED(ZM_CLI_METAKEYS)
 /* Calculates relative line number of given position in buffer */
-static uint32_t cli_line_num_with_buffer_offset_get(zm_cli_t const * p_cli,
+static zm_uint32_t cli_line_num_with_buffer_offset_get(zm_cli_t const * p_cli,
                                                     cli_cmd_len_t buffer_pos)
 {
-    uint32_t name_len;
+    zm_uint32_t name_len;
     zm_cli_multiline_cons_t *p_cons = &p_cli->m_ctx->vt100_ctx.cons;
 
     name_len = cli_strlen(p_cli->m_name);
@@ -380,10 +380,10 @@ static uint32_t cli_line_num_with_buffer_offset_get(zm_cli_t const * p_cli,
     return ((buffer_pos + name_len) / p_cons->terminal_wid);
 }
 /* Calculates column number of given position in buffer */
-static uint32_t cli_col_num_with_buffer_offset_get(zm_cli_t const * p_cli,
+static zm_uint32_t cli_col_num_with_buffer_offset_get(zm_cli_t const * p_cli,
                                                    cli_cmd_len_t buffer_pos)
 {
-    uint32_t name_len;
+    zm_uint32_t name_len;
     zm_cli_multiline_cons_t *p_cons = &p_cli->m_ctx->vt100_ctx.cons;
 
     name_len = cli_strlen(p_cli->m_name);
@@ -1047,7 +1047,7 @@ static void cmd_trim(zm_cli_t const * p_cli)
     }
 }
 
-static char make_argv(size_t * p_argc, char ** pp_argv, char * p_cmd, uint8_t max_argc)
+static char make_argv(size_t * p_argc, char ** pp_argv, char * p_cmd, zm_uint8_t max_argc)
 {
     char c;
     char quote = 0;
@@ -1118,8 +1118,8 @@ static char make_argv(size_t * p_argc, char ** pp_argv, char * p_cmd, uint8_t ma
 
                 if (t == '0')
                 {
-                    uint8_t i;
-                    uint8_t v = 0;
+                    zm_uint8_t i;
+                    zm_uint8_t v = 0;
 
                     for (i = 2; i < (2 + 3); i++)
                     {
@@ -1145,8 +1145,8 @@ static char make_argv(size_t * p_argc, char ** pp_argv, char * p_cmd, uint8_t ma
 
                 if (t == 'x')
                 {
-                    uint8_t i;
-                    uint8_t v = 0;
+                    zm_uint8_t i;
+                    zm_uint8_t v = 0;
 
                     for (i = 2; i < (2 + 2); i++)
                     {
@@ -2429,14 +2429,14 @@ static void vt100_color_set(zm_cli_t const * p_cli, zm_cli_vt100_color_t color)
             return;
         }
 
-        uint8_t cmd[] = ZM_PRINT_VT100_COLOR(color - 1);
+        zm_uint8_t cmd[] = ZM_PRINT_VT100_COLOR(color - 1);
 
         p_cli->m_ctx->vt100_ctx.col.col = color;
         zm_printf(p_cli->m_printf_ctx->printf_ctx, "%s", cmd);
     }
     else
     {
-        static uint8_t const cmd[] = ZM_PRINT_VT100_MODESOFF;
+        static zm_uint8_t const cmd[] = ZM_PRINT_VT100_MODESOFF;
 
         p_cli->m_ctx->vt100_ctx.col.col = color;
         zm_printf(p_cli->m_printf_ctx->printf_ctx, "%s", cmd);
@@ -2451,7 +2451,7 @@ static void vt100_bgcolor_set(zm_cli_t const * p_cli, zm_cli_vt100_color_t bgcol
             return;
         }
          /* -1 because default value is first in enum */
-        uint8_t cmd[] = ZM_PRINT_VT100_BGCOLOR(bgcolor - 1);
+        zm_uint8_t cmd[] = ZM_PRINT_VT100_BGCOLOR(bgcolor - 1);
 
         p_cli->m_ctx->vt100_ctx.col.bgcol = bgcolor;
         zm_printf(p_cli->m_printf_ctx->printf_ctx, "%s", cmd);
@@ -2482,7 +2482,7 @@ static void cli_write(zm_cli_t const *  p_cli,
     size_t cnt;
     while (length)
     {
-        cnt = p_cli->m_trans->m_cli_trans->write(&((uint8_t const *)p_data)[offset], length);
+        cnt = p_cli->m_trans->m_cli_trans->write(&((zm_uint8_t const *)p_data)[offset], length);
         offset += cnt;
         length -= cnt;
     }
@@ -2684,12 +2684,12 @@ void zm_cli_help_print(zm_cli_t const *               p_cli,
     ASSERT(p_cli);
     //ASSERT(p_cli->m_ctx && p_cli->p_iface && p_cli->p_name);
 
-    static uint8_t const tab_len = 2;
+    static zm_uint8_t const tab_len = 2;
     static char const opt_sep[] =", "; /* options separator */
     static char const help[] = "-h, --help";
     static char const cmd_sep[] = " - "; /* command separator */
-    uint16_t field_width = 0;
-    uint16_t longest_string = cli_strlen(help) - cli_strlen(opt_sep);
+    zm_uint16_t field_width = 0;
+    zm_uint16_t longest_string = cli_strlen(help) - cli_strlen(opt_sep);
 
     /* Printing help string for command. */
     zm_cli_printf(p_cli,
@@ -2858,7 +2858,7 @@ static void cli_history_show(zm_cli_t const * p_cli, size_t argc, char **argv)
     //print_usage(p_cli, argv[0], "");
     if(p_cli->m_cmd_hist->m_hist_num)
     {
-        uint8_t cnt;
+        zm_uint8_t cnt;
         
         p_cli->m_printf_ctx->printf(p_cli, ZM_PRINT_VT100_COLOR_BLUE, ZM_NEW_LINE"<<<<<<<<<< history >>>>>>>>>>"ZM_NEW_LINE);
         p_cli->m_cmd_hist->m_hist_current = p_cli->m_cmd_hist->m_hist_head;
@@ -2877,7 +2877,7 @@ static void cli_clear_history(zm_cli_t const * p_cli, size_t argc, char **argv)
     //print_usage(p_cli, argv[0], "");
     if(p_cli->m_cmd_hist->m_hist_num)
     {
-        uint8_t cnt;
+        zm_uint8_t cnt;
         p_cli->m_cmd_hist->m_hist_current = p_cli->m_cmd_hist->m_hist_head;
         for(cnt = 0; p_cli->m_cmd_hist->m_hist_current; cnt++)
         {
