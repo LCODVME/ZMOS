@@ -49,7 +49,11 @@ extern "C"
 /**
  * @brief ZMOS init section name.
  */
-#define ZMOS_INIT_SECTION_NAME      zmos_func_init    
+#define ZMOS_INIT_SECTION_NAME          zmos_func_init
+#define ZMOS_BOARD_SECTION_NAME         CONCAT_2(ZMOS_INIT_SECTION_NAME, 1)
+#define ZMOS_SYS_SECTION_NAME           CONCAT_2(ZMOS_INIT_SECTION_NAME, 2)
+#define ZMOS_COMPONENT_SECTION_NAME     CONCAT_2(ZMOS_INIT_SECTION_NAME, 3)
+#define ZMOS_APP_SECTION_NAME           CONCAT_2(ZMOS_INIT_SECTION_NAME, 4)
     
 /**
  * @brief   Macro for creating a ZMOS init section.
@@ -64,11 +68,36 @@ extern "C"
 /**
  * @brief Register ZMOS init functuion.
  *
- * @param[in] funcInit : The function to register(@ref zmos_funcInit).
+ * @param[in] funcInit : The function to register(@ref zmos_funcInit_t).
  */
 #define ZMOS_FUNC_INIT_REGISTER(funcInit) \
         ZM_SECTION_ITEM_REGISTER(ZMOS_INIT_SECTION_NAME, \
-                                 zmos_funcInit const CONCAT_3(zmos_, funcInit, _fn)) = funcInit
+                                 zmos_funcInit_t const CONCAT_3(zmos_, funcInit, _fn)) = funcInit
+        
+/**
+ * @brief Register ZMOS init functuion with level.
+ *
+ * @param[in] funcInit : The function to register(@ref zmos_funcInit_t).
+ * @param[in] section_name : Register which section.
+ */
+#define ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, section_name) \
+        ZM_SECTION_ITEM_REGISTER(section_name, \
+                                 zmos_funcInit_t const CONCAT_3(CONCAT_2(zmos_, level), funcInit, _fn)) = funcInit
+            
+/**
+ * @brief Register ZMOS init functuion with level.
+ *
+ * @param[in] funcInit : The function to register(@ref zmos_funcInit_t).
+ * @param[in] level : Init level.
+ * @param[in] section_name : Register which section.
+ */
+#define ZMOS_FUNC_INIT_LEVEL_REGISTER(funcInit, level, section_name) \
+        ZM_SECTION_ITEM_REGISTER(section_name, \
+                                 zmos_funcInit_t const CONCAT_3(CONCAT_2(zmos_, level), funcInit, _fn)) = funcInit
+#else
+#define ZMOS_FUNC_INIT_REGISTER(funcInit)
+#define ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, section_name) 
+#define ZMOS_FUNC_INIT_LEVEL_REGISTER(funcInit, level) 
 #endif
     
     
@@ -82,31 +111,47 @@ extern "C"
  *                                                       TYPEDEFS                                                        *
  *************************************************************************************************************************/
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-typedef void (* zmos_funcInit)(void);
+typedef void (* zmos_funcInit_t)(void);
 #endif
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
      
 /*********************************** ZMOS system interface ***************************************************************/
-     
+
 /*****************************************************************
 * FUNCTION: ZNOS_INIT_REGISTER
 *
 * DESCRIPTION:
 *     Register ZMOS init functuion.
 * INPUTS:
-*     funcInit : The function to register(@ref zmos_funcInit).
+*     funcInit : The function to register(@ref zmos_funcInit_t).
 * RETURNS:
 *     null
 * NOTE:
 *     null
 *****************************************************************/
-#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+// Register init at board
+#define ZMOS_INIT_BOARD_REGISTER(funcInit)      ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_BOARD_SECTION_NAME)
+// Register init at system
+#define ZMOS_INIT_SYS_REGISTER(funcInit)        ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_SYS_SECTION_NAME)
+// Register init at component
+#define ZMOS_INIT_COMPONENT_REGISTER(funcInit)  ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_COMPONENT_SECTION_NAME)
+// Register init at application
+#define ZMOS_INIT_APP_REGISTER(funcInit)        ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_APP_SECTION_NAME)
+/*****************************************************************
+* FUNCTION: ZNOS_INIT_REGISTER
+*
+* DESCRIPTION:
+*     Register ZMOS init functuion.
+* INPUTS:
+*     funcInit : The function to register(@ref zmos_funcInit_t).
+* RETURNS:
+*     null
+* NOTE:
+*     null
+*****************************************************************/
 #define ZNOS_INIT_REGISTER(funcInit)    ZMOS_FUNC_INIT_REGISTER(funcInit)
-#else
-#define ZNOS_INIT_REGISTER(funcInit) 
-#endif
 /*****************************************************************
 * FUNCTION: zmos_sysEnterCritical
 *

@@ -177,7 +177,7 @@ void zm_keyRegister(zmKeyType_t keys, uint8_t keyActive, uint32_t respEvent, zmK
             keyReg |= key;
             keys ^= key;
             
-            zmDriverSetEvent(ZM_DRIVER_KEY_POLL_EVENT);
+            zm_driverSetEvent(ZM_DRIVER_KEY_POLL_EVENT);
         }
         key <<= 1;
         stu++;
@@ -295,7 +295,7 @@ void zm_keyPollStart(void)
         }
     }
     zmKeyRun = 1;
-    zmDriverSetEvent(ZM_DRIVER_KEY_POLL_EVENT);
+    zm_driverSetEvent(ZM_DRIVER_KEY_POLL_EVENT);
 }
 /*****************************************************************
 * FUNCTION: zm_keyPollStop
@@ -312,7 +312,7 @@ void zm_keyPollStart(void)
 void zm_keyPollStop(void)
 {
     zmKeyRun = 0;
-    zmDriverStopTimerEvent(ZM_DRIVER_KEY_POLL_EVENT);
+    zm_driverStopTimerEvent(ZM_DRIVER_KEY_POLL_EVENT);
 }
 /*****************************************************************
 * FUNCTION: zm_setKeyConfig
@@ -617,7 +617,7 @@ void zm_keyPollProcess(void)
     }
     if(zmKeyRun && keyReg)
     {
-        zmDriverSetTimerEvent(ZM_DRIVER_KEY_POLL_EVENT, next, false);
+        zm_driverSetTimerEvent(ZM_DRIVER_KEY_POLL_EVENT, next, false);
     }
 }
 /*****************************************************************

@@ -252,7 +252,7 @@ void zm_ledSetBlinkNum(zmLedType_t leds, uint8_t numBlinks, uint8_t percent, uin
                 led <<= 1;
                 stu++;
             }
-            zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+            zm_driverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
         }
         else
         {
@@ -320,7 +320,7 @@ void zm_ledSetBlinkTime(zmLedType_t leds, uint32_t timeBlinks, uint8_t percent, 
                 led <<= 1;
                 stu++;
             }
-            zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+            zm_driverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
         }
         else
         {
@@ -395,7 +395,7 @@ void zmos_ledSetToggleNum(zmLedType_t leds, uint8_t numToggles, uint16_t period)
             led <<= 1;
             stu++;
         }
-        zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+        zm_driverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
     }
     else
     {
@@ -453,7 +453,7 @@ void zm_ledSetToggleTime(zmLedType_t leds, uint32_t timeToggles, uint16_t period
             led <<= 1;
             stu++;
         }
-        zmDriverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
+        zm_driverSetEvent(ZM_DRIVER_LED_BLINK_EVENT);
     }
     else
     {
@@ -568,7 +568,7 @@ void zm_updateLedBlink(void)
     }
     if(next)
     {
-        zmDriverSetTimerEvent(ZM_DRIVER_LED_BLINK_EVENT, next, false);
+        zm_driverSetTimerEvent(ZM_DRIVER_LED_BLINK_EVENT, next, false);
     }
 }
 /*****************************************************************

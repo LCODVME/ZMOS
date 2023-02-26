@@ -59,7 +59,7 @@ static zmos_taskHandle_t driverTaskHandle;
 /*************************************************************************************************************************
  *                                                 FUNCTION DECLARATIONS                                                 *
  *************************************************************************************************************************/
-static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events);
+static uTaskEvent_t zm_driverPorcessEvent(uTaskEvent_t events);
 /*************************************************************************************************************************
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
@@ -79,7 +79,7 @@ extern void zm_keyPollProcess(void);
  *                                                    LOCAL FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmDriverInit
+* FUNCTION: zm_driverInit
 *
 * DESCRIPTION:
 *     ZM drvers initialize
@@ -90,10 +90,10 @@ extern void zm_keyPollProcess(void);
 * NOTE:
 *     null
 *****************************************************************/
-void zmDriverInit(void)
+void zm_driverInit(void)
 {
     //Register task in ZMOS
-    zmos_taskThreadRegister(&driverTaskHandle, zmDriverPorcessEvent);
+    zmos_taskThreadRegister(&driverTaskHandle, zm_driverPorcessEvent);
     /* ZM led */
 #if ZM_LED_MAX_NUM > 0
     zm_ledInit();
@@ -104,7 +104,7 @@ void zmDriverInit(void)
 #endif
 }
 /*****************************************************************
-* FUNCTION: zmDriverPorcessEvent
+* FUNCTION: zm_driverPorcessEvent
 *
 * DESCRIPTION:
 *     
@@ -115,7 +115,7 @@ void zmDriverInit(void)
 * NOTE:
 *     null
 *****************************************************************/
-static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
+static uTaskEvent_t zm_driverPorcessEvent(uTaskEvent_t events)
 {
     
     if(events & ZM_DRIVER_LED_BLINK_EVENT)
@@ -136,7 +136,7 @@ static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
     return 0;
 }
 /*****************************************************************
-* FUNCTION: zmDriverSetEvent
+* FUNCTION: zm_driverSetEvent
 *
 * DESCRIPTION:
 *     This function set event in drver process.
@@ -147,12 +147,12 @@ static uTaskEvent_t zmDriverPorcessEvent(uTaskEvent_t events)
 * NOTE:
 *     null
 *****************************************************************/
-taskReslt_t zmDriverSetEvent(uTaskEvent_t events)
+taskReslt_t zm_driverSetEvent(uTaskEvent_t events)
 {
     return zmos_setTaskEvent(driverTaskHandle, events);
 }
 /*****************************************************************
-* FUNCTION: zmDriverSetTimerEvent
+* FUNCTION: zm_driverSetTimerEvent
 *
 * DESCRIPTION:
 *     This function start an event timer.
@@ -168,7 +168,7 @@ taskReslt_t zmDriverSetEvent(uTaskEvent_t events)
 *     If the event timer already exists, Timeout and Reload 
 *     properties will be updated.
 *****************************************************************/
-timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload)
+timerReslt_t zm_driverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload)
 {
     if(reload)
     {
@@ -180,7 +180,7 @@ timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool r
     }
 }
 /*****************************************************************
-* FUNCTION: zmDriverStopTimerEvent
+* FUNCTION: zm_driverStopTimerEvent
 *
 * DESCRIPTION:
 *     This function stop an event timer.
@@ -192,12 +192,12 @@ timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool r
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events)
+timerReslt_t zm_driverStopTimerEvent(uTaskEvent_t events)
 {
     return zmos_stopTimer(driverTaskHandle, events);
 }
 
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-ZNOS_INIT_REGISTER(zmDriverInit);
+ZMOS_INIT_SYS_REGISTER(zm_driverInit);
 #endif
 /****************************************************** END OF FILE ******************************************************/

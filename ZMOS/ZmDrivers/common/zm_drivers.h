@@ -54,7 +54,7 @@ extern "C"
  *                                                   PUBLIC FUNCTIONS                                                    *
  *************************************************************************************************************************/
 /*****************************************************************
-* FUNCTION: zmDriverInit
+* FUNCTION: zm_driverInit
 *
 * DESCRIPTION:
 *     ZM drvers initialize
@@ -65,9 +65,9 @@ extern "C"
 * NOTE:
 *     null
 *****************************************************************/
-void zmDriverInit(void);
+void zm_driverInit(void);
 /*****************************************************************
-* FUNCTION: zmDriverSetEvent
+* FUNCTION: zm_driverSetEvent
 *
 * DESCRIPTION:
 *     This function set event in drver process.
@@ -78,9 +78,9 @@ void zmDriverInit(void);
 * NOTE:
 *     null
 *****************************************************************/
-taskReslt_t zmDriverSetEvent(uTaskEvent_t events);
+taskReslt_t zm_driverSetEvent(uTaskEvent_t events);
 /*****************************************************************
-* FUNCTION: zmDriverSetTimerEvent
+* FUNCTION: zm_driverSetTimerEvent
 *
 * DESCRIPTION:
 *     This function start an event timer.
@@ -96,9 +96,9 @@ taskReslt_t zmDriverSetEvent(uTaskEvent_t events);
 *     If the event timer already exists, Timeout and Reload 
 *     properties will be updated.
 *****************************************************************/
-timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload);
+timerReslt_t zm_driverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool reload);
 /*****************************************************************
-* FUNCTION: zmDriverStopTimerEvent
+* FUNCTION: zm_driverStopTimerEvent
 *
 * DESCRIPTION:
 *     This function stop an event timer.
@@ -110,7 +110,7 @@ timerReslt_t zmDriverSetTimerEvent(uTaskEvent_t events, uint32_t timeout, bool r
 * NOTE:
 *     null
 *****************************************************************/
-timerReslt_t zmDriverStopTimerEvent(uTaskEvent_t events);
+timerReslt_t zm_driverStopTimerEvent(uTaskEvent_t events);
 
 #ifdef __cplusplus
 }

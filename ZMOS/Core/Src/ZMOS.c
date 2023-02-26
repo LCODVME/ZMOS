@@ -31,8 +31,24 @@
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-#define ZMOS_FUNC_INIT_SECTION_ITEM_GET(i) ZM_SECTION_ITEM_GET(ZMOS_INIT_SECTION_NAME, zmos_funcInit, (i))
-#define ZMOS_FUNC_INIT_SECTION_ITEM_COUNT  ZM_SECTION_ITEM_COUNT(ZMOS_INIT_SECTION_NAME, zmos_funcInit)
+//#define ZMOS_FUNC_INIT_SECTION_ITEM_GET(i)          ZM_SECTION_ITEM_GET(ZMOS_INIT_SECTION_NAME, zmos_funcInit_t, (i))
+#define ZMOS_FUN_INIT_SECTION_GET(section)          ZM_SECTION_START_ADDR(section);
+#define ZMOS_FUNC_INIT_SECTION_ITEM_COUNT(section)  ZM_SECTION_ITEM_COUNT(section, zmos_funcInit_t)
+#endif
+
+
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+
+//ZMOS section init function initialize
+#define ZMOS_INIT_COLLECTION(section) \
+    p_funcInit = ZMOS_FUN_INIT_SECTION_GET(section);        \
+    funcNum = ZMOS_FUNC_INIT_SECTION_ITEM_COUNT(section);   \
+    for(zm_uint16_t i = 0; i < funcNum; i++)                \
+    {                                                       \
+        if(p_funcInit[i]) p_funcInit[i]();                  \
+    }
+#else
+#define ZMOS_INIT_COLLECTION(section) 
 #endif
 /*************************************************************************************************************************
  *                                                      CONSTANTS                                                        *
@@ -46,10 +62,13 @@
  *                                                   GLOBAL VARIABLES                                                    *
  *************************************************************************************************************************/
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-ZMOS_INIT_SECTION_DEF(ZMOS_INIT_SECTION_NAME, zmos_funcInit);
+ZMOS_INIT_SECTION_DEF(ZMOS_BOARD_SECTION_NAME, zmos_funcInit_t);
+ZMOS_INIT_SECTION_DEF(ZMOS_SYS_SECTION_NAME, zmos_funcInit_t);
+ZMOS_INIT_SECTION_DEF(ZMOS_COMPONENT_SECTION_NAME, zmos_funcInit_t);
+ZMOS_INIT_SECTION_DEF(ZMOS_APP_SECTION_NAME, zmos_funcInit_t);
 #endif
 /* ZMOS nesting variable */
-static uint16_t zmosCriticalNesting = 0xCCCC;
+static zm_uint16_t zmosCriticalNesting = 0xCCCC;
 /*************************************************************************************************************************
  *                                                  EXTERNAL VARIABLES                                                   *
  *************************************************************************************************************************/
@@ -86,8 +105,8 @@ extern void zmos_lowPowerManagement(void);
 *****************************************************************/
 static void zmos_systemClockUpdate(void)
 {
-    uint32_t zmos_clock;
-    uint32_t clockCnt;
+    zm_uint32_t zmos_clock;
+    zm_uint32_t clockCnt;
     
     //Get the clock count of timer ticks.
     clockCnt = bsp_getClockCount();
@@ -149,8 +168,15 @@ void zmos_sysExitCritical(void)
 *****************************************************************/
 void zmos_system_init(void)
 {
+#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
+    //ZMOS section init variable
+    zmos_funcInit_t *p_funcInit;
+    zm_uint16_t funcNum;
+#endif
     //Initialize critical nesting
     zmosCriticalNesting = 0;
+    //Board init
+    ZMOS_INIT_COLLECTION(ZMOS_BOARD_SECTION_NAME);
     // Initialize bsp
     bsp_init();
     
@@ -165,20 +191,18 @@ void zmos_system_init(void)
     // Initialize the callback timer
     zmos_cbTimerInit();
 #endif
-    
-#if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-    //ZMOS section init function initialize
-    zmos_funcInit *p_funcInit = ZM_SECTION_START_ADDR(ZMOS_INIT_SECTION_NAME);
-    for(uint16_t i = 0; i < ZMOS_FUNC_INIT_SECTION_ITEM_COUNT; i++)
-    {
-        if(p_funcInit[i]) p_funcInit[i]();
-    }
-#endif
+    //System init
+    ZMOS_INIT_COLLECTION(ZMOS_SYS_SECTION_NAME);
     
 #if ZMOS_USE_LOW_POWER
     // Initialize the power management system
     zmos_lowPwrMgrInit();
 #endif
+    //Component init
+    ZMOS_INIT_COLLECTION(ZMOS_COMPONENT_SECTION_NAME);
+    
+    //Application init
+    ZMOS_INIT_COLLECTION(ZMOS_APP_SECTION_NAME);
 }
 
 /*****************************************************************

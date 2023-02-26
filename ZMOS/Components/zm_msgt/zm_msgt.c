@@ -513,6 +513,6 @@ static void zm_msgtMsgGc(void)
 }
 
 #if (defined ZMOS_INIT_SECTION) && (ZMOS_INIT_SECTION)
-ZNOS_INIT_REGISTER(zm_msgtInit);
+ZMOS_INIT_COMPONENT_REGISTER(zm_msgtInit);
 #endif
 /****************************************************** END OF FILE ******************************************************/
