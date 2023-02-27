@@ -133,17 +133,26 @@ msgtResult_t zm_msgtPublishMsg(msgtTopic_t topic, zm_uint8_t *msg, zm_msgLen_t m
                 newMsgNode->msgLen = msgLen;
                 newMsgNode->count = 0;
                 newMsgNode->next = NULL;
-                while(srchNode->msgNodeList->next != NULL) srchNode->msgNodeList = srchNode->msgNodeList->next;
-                srchNode->msgNodeList->next = newMsgNode;
-                while(srchNode->noticeNodeList)
+                
+                msgNode_t *pMsgNode = srchNode->msgNodeList;
+                if(pMsgNode)
                 {
-                    if(srchNode->noticeNodeList->msgNode == NULL)
-                    {
-                        srchNode->noticeNodeList->msgNode = newMsgNode;
-                        if(srchNode->noticeNodeList->noticFunc)
-                            srchNode->noticeNodeList->noticFunc(topic, msgLen);
-                    }
+                    while(pMsgNode->next != NULL) pMsgNode = pMsgNode->next;
+                    pMsgNode->next = newMsgNode;
+                }
+                else srchNode->msgNodeList = newMsgNode;
+                
+                noticeNode_t *pNnoticNode = srchNode->noticeNodeList;
+                while(pNnoticNode)
+                {
                     newMsgNode->count++;
+                    if(pNnoticNode->msgNode == NULL)
+                    {
+                        pNnoticNode->msgNode = newMsgNode;
+                        if(pNnoticNode->noticFunc)
+                            pNnoticNode->noticFunc(topic, msgLen);
+                    }
+                    pNnoticNode = pNnoticNode->next;
                 }
                 return MSGT_OK;
             }
@@ -193,7 +202,8 @@ msgtResult_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, z
         if(newNode)
         {
             newNode->noticeNodeList = (noticeNode_t *)zmos_malloc(sizeof(noticeNode_t));
-            if(!newNode->noticeNodeList)
+            msgtClient_t *newClient = (msgtClient_t *)zmos_malloc(sizeof(msgtClient_t));
+            if(!newNode->noticeNodeList || !newClient)
             {
                 zmos_free(newNode);
                 return MSGT_NO_SPACE;
@@ -204,28 +214,17 @@ msgtResult_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, z
             newNode->noticeNodeList->msgNode = NULL;
             newNode->noticeNodeList->noticFunc = noticFunc;
             newNode->noticeNodeList->next = NULL;
+            
+            newClient->topic = topic;
+            newClient->noticeNode = newNode->noticeNodeList;
+            newClient->next = NULL;
             if(client->node)
             {
                 msgtClient_t *pClient = (msgtClient_t *)client->node;
                 while(pClient->next != NULL) pClient = pClient->next;
-                pClient->topic = topic;
-                pClient->noticeNode = newNode->noticeNodeList;
-                pClient->next = NULL;
+                pClient->next = newClient;
             }
-            else
-            {
-                msgtClient_t *pClient = (msgtClient_t *)zmos_malloc(sizeof(msgtClient_t));
-                if(!pClient)
-                {
-                    zmos_free(newNode->noticeNodeList);
-                    zmos_free(newNode);
-                    return MSGT_NO_SPACE;
-                }
-                pClient->topic = topic;
-                pClient->noticeNode = newNode->noticeNodeList;
-                pClient->next = NULL;
-                client->node = pClient;
-            }
+            else client->node = newClient;
             if(prevNode)
             {
                 newNode->next = prevNode->next;
@@ -275,9 +274,9 @@ msgtResult_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, z
             pNoticeNode->next = NULL;
             pNoticeNode->msgNode = NULL;
             pNoticeNode->noticFunc = noticFunc;
-            noticeNode_t *srcNoticeNode = srchNode->noticeNodeList;
-            while(srcNoticeNode->next != NULL) srcNoticeNode = srcNoticeNode->next;
-            srcNoticeNode->next = pNoticeNode;
+            noticeNode_t *srchNoticeNode = srchNode->noticeNodeList;
+            while(srchNoticeNode->next != NULL) srchNoticeNode = srchNoticeNode->next;
+            srchNoticeNode->next = pNoticeNode;
         }
         else return MSGT_NO_SPACE;
     }
@@ -299,7 +298,6 @@ msgtResult_t zm_msgtSubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic, z
 msgtResult_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
 {
     topicNode_t *srchNode = topicNodeListHead;
-    topicNode_t *prevTopicNode = NULL;
     msgtClient_t *pClient = (msgtClient_t *)client->node;
     msgtClient_t *prevClient = NULL;
     while(srchNode && pClient)
@@ -327,24 +325,14 @@ msgtResult_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
                     else
                     {
                         srchNode->noticeNodeList = srchNode->noticeNodeList->next;
-                        if(srchNode->noticeNodeList->next == NULL)
-                        {
-                            msgNode_t *delMsgNode;
-                            while(srchNode->msgNodeList)
-                            {
-                                delMsgNode = srchNode->msgNodeList;
-                                srchNode->msgNodeList = srchNode->msgNodeList->next;
-                                if(delMsgNode->msg) zmos_free(delMsgNode->msg);
-                                zmos_free(delMsgNode);
-                            }
-                            if(prevTopicNode)
-                            {
-                                prevTopicNode->next = srchNode->next;
-                            }
-                            else topicNodeListHead = topicNodeListHead->next;
-                            zmos_free(srchNode);
-                        }
                     }
+                    while(delNoticeNode->msgNode)
+                    {
+                        delNoticeNode->msgNode->count--;
+                        delNoticeNode->msgNode = delNoticeNode->msgNode->next;
+                    }
+                    zmos_setTaskEvent(msgtTaskHandle, ZM_MSGT_MSG_GC_EVENT);
+                    
                     zmos_free(delNoticeNode);
                     break;
                 }
@@ -354,7 +342,6 @@ msgtResult_t zm_msgtUnsubscribeTopic(zm_msgtClient_t *client, msgtTopic_t topic)
             zmos_free(pClient);
             break;
         }
-        prevTopicNode = srchNode;
         srchNode = srchNode->next;
         prevClient = pClient;
         pClient = pClient->next;
@@ -392,6 +379,7 @@ msgtMsg_t zm_msgtGetMsg(zm_msgtClient_t client)
             zmos_setTaskEvent(msgtTaskHandle, ZM_MSGT_MSG_GC_EVENT);
             break;
         }
+        pClient = pClient->next;
     }
     return pMsg;
 }
@@ -430,6 +418,7 @@ msgtMsg_t zm_msgtGetTopicMsg(zm_msgtClient_t client, msgtTopic_t topic)
             }
             break;
         }
+        pClient = pClient->next;
     }
     return pMsg;
 }
@@ -485,10 +474,31 @@ static uTaskEvent_t zm_msgtPorcessEvent(uTaskEvent_t events)
 static void zm_msgtMsgGc(void)
 {
     topicNode_t *srchNode = topicNodeListHead;
+    topicNode_t *prevNode = NULL;
     msgNode_t *prevMsgNode;
     msgNode_t *delMsgNode;
     while(srchNode)
     {
+        if(srchNode->noticeNodeList == NULL)
+        {
+            topicNode_t *delNode = srchNode;
+            
+            srchNode = srchNode->next;
+            while(delNode->msgNodeList)
+            {
+                delMsgNode = delNode->msgNodeList;
+                delNode->msgNodeList = delNode->msgNodeList->next;
+                if(delMsgNode->msg) zmos_free(delMsgNode->msg);
+                zmos_free(delMsgNode);
+            }
+            if(prevNode)
+            {
+                prevNode->next = delNode->next;
+            }
+            else topicNodeListHead = topicNodeListHead->next;
+            zmos_free(delNode);
+            continue;
+        }
         prevMsgNode = NULL;
         while(srchNode->msgNodeList)
         {
@@ -499,15 +509,17 @@ static void zm_msgtMsgGc(void)
                 {
                     prevMsgNode->next = delMsgNode->next;
                 }
-                else
-                {
-                    srchNode->msgNodeList = srchNode->msgNodeList->next;
-                }
+                srchNode->msgNodeList = srchNode->msgNodeList->next;
+                if(delMsgNode->msg) zmos_free(delMsgNode->msg);
                 zmos_free(delMsgNode);
             }
-            prevMsgNode = srchNode->msgNodeList;
-            srchNode->msgNodeList = srchNode->msgNodeList->next;
+            else
+            {
+                prevMsgNode = srchNode->msgNodeList;
+                srchNode->msgNodeList = srchNode->msgNodeList->next;
+            }
         }
+        prevNode = srchNode;
         srchNode = srchNode->next;
     }
 }
