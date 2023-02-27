@@ -39,9 +39,9 @@ extern "C"
 /*************************************************************************************************************************
  *                                                        MACROS                                                         *
  *************************************************************************************************************************/
-#define ZMOS_PRIMAIRE_VERSION   (1)
-#define ZMOS_SUB_VERSION        (2)
-#define ZMOS_REVISED_VERSION    (1)
+#define ZMOS_PRIMAIRE_VERSION   1
+#define ZMOS_SUB_VERSION        2
+#define ZMOS_REVISED_VERSION    1
     
 #define ZMOS_VERSION_NUMBER     ((ZMOS_PRIMAIRE_VERSION << 4) | (ZMOS_SUB_VERSION << 2) | ZMOS_REVISED_VERSION)
 #define ZMOS_VERSION_STRING     STRINGIFY(ZMOS_PRIMAIRE_VERSION.ZMOS_SUB_VERSION.ZMOS_REVISED_VERSION)
@@ -141,19 +141,6 @@ typedef void (* zmos_funcInit_t)(void);
 #define ZMOS_INIT_COMPONENT_REGISTER(funcInit)  ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_COMPONENT_SECTION_NAME)
 // Register init at application
 #define ZMOS_INIT_APP_REGISTER(funcInit)        ZMOS_FUNC_INIT_REGISTER_SECTION(funcInit, ZMOS_APP_SECTION_NAME)
-/*****************************************************************
-* FUNCTION: ZNOS_INIT_REGISTER
-*
-* DESCRIPTION:
-*     Register ZMOS init functuion.
-* INPUTS:
-*     funcInit : The function to register(@ref zmos_funcInit_t).
-* RETURNS:
-*     null
-* NOTE:
-*     null
-*****************************************************************/
-#define ZNOS_INIT_REGISTER(funcInit)    ZMOS_FUNC_INIT_REGISTER(funcInit)
 /*****************************************************************
 * FUNCTION: zmos_sysEnterCritical
 *
